@@ -1,0 +1,10 @@
+{
+  "item.lockdown.steel_ingot": "Steel Ingot",
+  "item.lockdown.steel_bar": "Steel Bar",
+
+
+  "block.lockdown.steel_block": "Steel Block",
+  "block.lockdown.safe": "Safe",
+
+  "itemGroup.lockdown_tab": "LockDown"
+}

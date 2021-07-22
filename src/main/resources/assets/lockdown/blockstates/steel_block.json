@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "lockdown:block/steel_block"
+    }
+  }
+}
