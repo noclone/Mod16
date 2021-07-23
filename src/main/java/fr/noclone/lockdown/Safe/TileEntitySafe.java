@@ -32,6 +32,16 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
     private NonNullList<ItemStack> items;
     private final LazyOptional<? extends IItemHandler>[] handlers;
 
+    private boolean isUnlocked = false;
+
+    public boolean isUnlocked() {
+        return isUnlocked;
+    }
+
+    public void setUnlocked(boolean unlocked) {
+        isUnlocked = unlocked;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -50,7 +60,7 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
     private String password = "";
 
-    private String correctPassword = "";
+    private String correctPassword = "1234";
 
     public TileEntitySafe() {
         super(ModTileEntities.SAFE_TILE_ENTITY.get());
@@ -80,18 +90,28 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
     @Override
     protected ITextComponent getDefaultName() {
-        return new TranslationTextComponent("Safe");
+        return new TranslationTextComponent("Safe Lock");
     }
+
 
     @Override
     protected Container createMenu(int id, PlayerInventory playerInventory) {
-        return new ContainerSafe(id, playerInventory, this, this.fields);
+        if(isUnlocked)
+            return new ContainerSafe(id, playerInventory, this, this.fields);
+        else
+            return new ContainerSafeLocked(id, playerInventory, this, this.fields);
     }
 
     private final IIntArray fields = new IIntArray() {
         @Override
         public int get(int index) {
             switch (index) {
+                case 0:
+                    return getBlockPos().getX();
+                case 1:
+                    return getBlockPos().getY();
+                case 2:
+                    return getBlockPos().getZ();
                 default:
                     return 0;
             }
@@ -105,7 +125,7 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
         @Override
         public int getCount() {
-            return 1;
+            return 3;
         }
     };
 

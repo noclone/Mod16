@@ -1,8 +1,6 @@
 package fr.noclone.lockdown.Safe;
 
 import fr.noclone.lockdown.init.ModContainerTypes;
-import fr.noclone.lockdown.init.ModTileEntities;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -15,60 +13,35 @@ import net.minecraft.util.IIntArray;
 import net.minecraft.util.IntArray;
 import net.minecraft.util.math.BlockPos;
 
-public class ContainerSafe extends Container {
+public class ContainerSafeLocked extends Container {
 
     private final IInventory inventory;
     private IIntArray fields;
 
-    public ContainerSafe(int id, PlayerInventory playerInventory, PacketBuffer buffer)
+    public TileEntitySafe getTileEntitySafe() {
+        return tileEntitySafe;
+    }
+
+    private TileEntitySafe tileEntitySafe;
+
+    public ContainerSafeLocked(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
         this(id, playerInventory, new TileEntitySafe(), new IntArray(buffer.readByte()));
     }
 
-    public ContainerSafe(int id, PlayerInventory playerInventory, IInventory inventory, IIntArray fields)
+    public ContainerSafeLocked(int id, PlayerInventory playerInventory, IInventory inventory, IIntArray fields)
     {
-        super(ModContainerTypes.SAFE.get(), id);
+        super(ModContainerTypes.SAFE_LOCKED.get(), id);
         this.inventory = inventory;
         this.fields = fields;
-
-        addSafeInventory();
-        addPlayerInventory(playerInventory);
-
-    }
-
-    private void addSafeInventory()
-    {
-        for (int y = 0; y < 3; ++y) {
-            for (int x = 0; x < 9; ++x) {
-                int index = x + y * 9;
-                int posX = 8 + x * 18;
-                int posY = 18 + y * 18;
-                this.addSlot(new Slot(this.inventory, index, posX, posY));
-            }
-        }
-    }
-
-    private void addPlayerInventory(PlayerInventory playerInventory)
-    {
-
-        for (int y = 0; y < 3; ++y) {
-            for (int x = 0; x < 9; ++x) {
-                int index = x + y * 9 + 9;
-                int posX = 8 + x * 18;
-                int posY = 84 + y * 18;
-                this.addSlot(new Slot(playerInventory, index, posX, posY));
-            }
+        BlockPos pos = new BlockPos(fields.get(0),fields.get(1),fields.get(2));
+        TileEntity te =  playerInventory.player.level.getBlockEntity(pos);
+        if(te instanceof TileEntitySafe)
+        {
+            this.tileEntitySafe = (TileEntitySafe) te;
         }
 
-        // Player hotbar
-        for (int x = 0; x < 9; ++x) {
-            int index = x;
-            int posX = 8 + x * 18;
-            int posY = 142;
-            this.addSlot(new Slot(playerInventory, index, posX, posY));
-        }
     }
-
 
     @Override
     public boolean stillValid(PlayerEntity player) {
