@@ -106,12 +106,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         @Override
         public int get(int index) {
             switch (index) {
-                case 0:
-                    return getBlockPos().getX();
-                case 1:
-                    return getBlockPos().getY();
-                case 2:
-                    return getBlockPos().getZ();
                 default:
                     return 0;
             }
@@ -131,6 +125,9 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
     void encodeExtraData(PacketBuffer buffer) {
         buffer.writeByte(fields.getCount());
+        buffer.writeInt(getBlockPos().getX());
+        buffer.writeInt(getBlockPos().getY());
+        buffer.writeInt(getBlockPos().getZ());
     }
 
     @Override

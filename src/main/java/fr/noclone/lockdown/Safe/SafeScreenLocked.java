@@ -17,15 +17,12 @@ import java.util.List;
 public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
     public static final ResourceLocation LOCKED = new ResourceLocation(LockDown.MODID, "textures/gui/safe_lock.png");
 
-    TileEntitySafe tileEntitySafe;
-
     ContainerSafeLocked containerSafeLocked;
 
     public SafeScreenLocked(ContainerSafeLocked containerSafeLocked, PlayerInventory playerInventory, ITextComponent textComponent) {
         super(containerSafeLocked, playerInventory, textComponent);
 
         this.containerSafeLocked = containerSafeLocked;
-        tileEntitySafe = containerSafeLocked.getTileEntitySafe();
     }
 
     @Override
@@ -54,7 +51,6 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
                 (button)->{onNumberClicked(0);}));
 
     }
-
 
     @Override
     protected void renderLabels(MatrixStack p_230451_1_, int p_230451_2_, int p_230451_3_) {

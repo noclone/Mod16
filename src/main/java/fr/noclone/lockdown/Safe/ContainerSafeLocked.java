@@ -1,6 +1,7 @@
 package fr.noclone.lockdown.Safe;
 
 import fr.noclone.lockdown.init.ModContainerTypes;
+import jdk.nashorn.internal.ir.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -18,12 +19,6 @@ public class ContainerSafeLocked extends Container {
     private final IInventory inventory;
     private IIntArray fields;
 
-    public TileEntitySafe getTileEntitySafe() {
-        return tileEntitySafe;
-    }
-
-    private TileEntitySafe tileEntitySafe;
-
     public ContainerSafeLocked(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
         this(id, playerInventory, new TileEntitySafe(), new IntArray(buffer.readByte()));
@@ -34,13 +29,6 @@ public class ContainerSafeLocked extends Container {
         super(ModContainerTypes.SAFE_LOCKED.get(), id);
         this.inventory = inventory;
         this.fields = fields;
-        BlockPos pos = new BlockPos(fields.get(0),fields.get(1),fields.get(2));
-        TileEntity te =  playerInventory.player.level.getBlockEntity(pos);
-        if(te instanceof TileEntitySafe)
-        {
-            this.tileEntitySafe = (TileEntitySafe) te;
-        }
-
     }
 
     @Override
