@@ -5,6 +5,7 @@ import fr.noclone.lockdown.init.ModBlocks;
 import fr.noclone.lockdown.init.ModContainerTypes;
 import fr.noclone.lockdown.init.ModItems;
 import fr.noclone.lockdown.init.ModTileEntities;
+import fr.noclone.lockdown.network.Messages;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -41,7 +42,7 @@ public class LockDown {
 
     private void setup(FMLCommonSetupEvent e)
     {
-
+        Messages.registerNetworkPackets();
     }
 
     private void clientSetup(FMLCommonSetupEvent e)

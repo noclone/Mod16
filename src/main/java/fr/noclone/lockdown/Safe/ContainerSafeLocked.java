@@ -24,9 +24,6 @@ public class ContainerSafeLocked extends Container {
 
     private TileEntitySafe tileEntitySafe;
 
-    public TileEntitySafe getTileEntitySafe() {
-        return tileEntitySafe;
-    }
 
     public ContainerSafeLocked(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
@@ -51,5 +48,11 @@ public class ContainerSafeLocked extends Container {
     @Override
     public boolean stillValid(PlayerEntity player) {
         return true;
+    }
+
+    public void sync(Boolean isUnlocked, String correctPassword)
+    {
+        tileEntitySafe.setUnlocked(isUnlocked);
+        tileEntitySafe.setCorrectPassword(correctPassword);
     }
 }

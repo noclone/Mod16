@@ -20,6 +20,9 @@ public class ContainerSafe extends Container {
     private final IInventory inventory;
     private IIntArray fields;
 
+    private TileEntitySafe tileEntitySafe;
+
+
     public ContainerSafe(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
         this(id, playerInventory, new TileEntitySafe(), new IntArray(buffer.readByte()));
@@ -30,6 +33,7 @@ public class ContainerSafe extends Container {
         super(ModContainerTypes.SAFE.get(), id);
         this.inventory = inventory;
         this.fields = fields;
+        this.tileEntitySafe = (TileEntitySafe) inventory;
 
         addSafeInventory();
         addPlayerInventory(playerInventory);
@@ -98,5 +102,11 @@ public class ContainerSafe extends Container {
         }
 
         return itemstack;
+    }
+
+    public void sync(Boolean isUnlocked, String correctPassword)
+    {
+        tileEntitySafe.setUnlocked(isUnlocked);
+        tileEntitySafe.setCorrectPassword(correctPassword);
     }
 }

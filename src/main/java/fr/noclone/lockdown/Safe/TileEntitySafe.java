@@ -1,9 +1,13 @@
 package fr.noclone.lockdown.Safe;
 
 import fr.noclone.lockdown.init.ModTileEntities;
+import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketSyncSafe;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
@@ -21,13 +25,14 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 import javax.annotation.Nullable;
 
-public class TileEntitySafe extends LockableTileEntity implements ISidedInventory {
+public class TileEntitySafe extends LockableTileEntity implements ISidedInventory{
 
     private NonNullList<ItemStack> items;
     private final LazyOptional<? extends IItemHandler>[] handlers;
@@ -65,6 +70,7 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         this.items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
         ItemStackHelper.loadAllItems(compoundNBT, this.items);
         correctPassword = compoundNBT.getString("correctPassword");
+        isUnlocked = compoundNBT.getBoolean("isUnlocked");
     }
 
     @Override
@@ -73,7 +79,24 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
         ItemStackHelper.saveAllItems(compoundNBT, this.items);
         compoundNBT.putString("correctPassword", correctPassword);
+        compoundNBT.putBoolean("isUnlocked", isUnlocked);
         return compoundNBT;
+    }
+
+    @Nullable
+    @Override
+    public SUpdateTileEntityPacket getUpdatePacket() {
+        CompoundNBT tags = this.getUpdateTag();
+        ItemStackHelper.saveAllItems(tags, this.items);
+        return new SUpdateTileEntityPacket(this.worldPosition, 1, tags);
+    }
+
+    @Override
+    public CompoundNBT getUpdateTag() {
+        CompoundNBT tags = super.getUpdateTag();
+        tags.putString("correctPassword", correctPassword);
+        tags.putBoolean("isUnlocked", isUnlocked);
+        return tags;
     }
 
     @Override
@@ -85,7 +108,11 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
     @Override
     protected Container createMenu(int id, PlayerInventory playerInventory) {
         if(isUnlocked)
+        {
+            isUnlocked = false;
+            Messages.sendToPlayer((ServerPlayerEntity) playerInventory.player, isUnlocked, correctPassword);
             return new ContainerSafe(id, playerInventory, this, this.fields);
+        }
         else
             return new ContainerSafeLocked(id, playerInventory, this, this.fields);
     }
@@ -191,20 +218,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
     @Override
     public void clearContent() {
         items.clear();
-    }
-
-    @Nullable
-    @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        CompoundNBT tags = this.getUpdateTag();
-        ItemStackHelper.saveAllItems(tags, this.items);
-        return new SUpdateTileEntityPacket(this.worldPosition, 1, tags);
-    }
-
-    @Override
-    public CompoundNBT getUpdateTag() {
-        CompoundNBT tags = super.getUpdateTag();
-        return tags;
     }
 
     @Nullable

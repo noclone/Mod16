@@ -3,6 +3,8 @@ package fr.noclone.lockdown.Safe;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.noclone.lockdown.LockDown;
+import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketSyncSafe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -99,6 +101,7 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
         if(password.equals(tileEntitySafe.getCorrectPassword()))
         {
             tileEntitySafe.setUnlocked(true);
+            Messages.INSTANCE.sendToServer(new PacketSyncSafe(tileEntitySafe.isUnlocked(), tileEntitySafe.getCorrectPassword()));
         }
     }
 }
