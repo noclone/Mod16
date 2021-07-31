@@ -3,11 +3,15 @@ package fr.noclone.lockdown.Safe;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.noclone.lockdown.LockDown;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIntArray;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -19,10 +23,20 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
 
     ContainerSafeLocked containerSafeLocked;
 
+    TileEntitySafe tileEntitySafe;
+
+    String password = "";
+
     public SafeScreenLocked(ContainerSafeLocked containerSafeLocked, PlayerInventory playerInventory, ITextComponent textComponent) {
         super(containerSafeLocked, playerInventory, textComponent);
 
         this.containerSafeLocked = containerSafeLocked;
+
+        IIntArray fields = containerSafeLocked.getFields();
+
+        TileEntity te = Minecraft.getInstance().level.getBlockEntity(new BlockPos(fields.get(1),fields.get(2),fields.get(3)));
+        if(te instanceof TileEntitySafe)
+            tileEntitySafe = (TileEntitySafe) te;
     }
 
     @Override
@@ -62,6 +76,7 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
         this.renderTooltip(matrixStack, x, y);
+        drawCenteredString(matrixStack, font, password+"   "+tileEntitySafe.isUnlocked(), getGuiLeft()+width/2, getGuiTop()+5, 0x52FF33);
     }
 
     @Override
@@ -80,6 +95,10 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
 
     private void onNumberClicked(int nb)
     {
-        minecraft.player.closeContainer();
+        password += nb;
+        if(password.equals(tileEntitySafe.getCorrectPassword()))
+        {
+            tileEntitySafe.setUnlocked(true);
+        }
     }
 }

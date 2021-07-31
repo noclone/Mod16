@@ -42,14 +42,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         isUnlocked = unlocked;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getCorrectPassword() {
         return correctPassword;
     }
@@ -57,8 +49,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
     public void setCorrectPassword(String correctPassword) {
         this.correctPassword = correctPassword;
     }
-
-    private String password = "";
 
     private String correctPassword = "1234";
 
@@ -74,7 +64,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
         this.items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
         ItemStackHelper.loadAllItems(compoundNBT, this.items);
-        password = compoundNBT.getString("password");
         correctPassword = compoundNBT.getString("correctPassword");
     }
 
@@ -83,7 +72,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         super.save(compoundNBT);
 
         ItemStackHelper.saveAllItems(compoundNBT, this.items);
-        compoundNBT.putString("password", password);
         compoundNBT.putString("correctPassword", correctPassword);
         return compoundNBT;
     }
@@ -106,6 +94,12 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         @Override
         public int get(int index) {
             switch (index) {
+                case 1:
+                    return getBlockPos().getX();
+                case 2:
+                    return getBlockPos().getY();
+                case 3:
+                    return getBlockPos().getZ();
                 default:
                     return 0;
             }
@@ -114,12 +108,18 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         @Override
         public void set(int index, int value) {
             switch (index) {
+                case 1:
+                    fields.set(1,getBlockPos().getX());
+                case 2:
+                    fields.set(2,getBlockPos().getY());
+                case 3:
+                    fields.set(3,getBlockPos().getZ());
             }
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
     };
 
