@@ -1,10 +1,6 @@
-package fr.noclone.lockdown.Safe;
+package fr.noclone.lockdown.bankserver;
 
 import fr.noclone.lockdown.init.ModContainerTypes;
-import fr.noclone.lockdown.init.ModTileEntities;
-import fr.noclone.lockdown.network.Messages;
-import fr.noclone.lockdown.network.PacketSyncSafe;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -12,14 +8,12 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.IntArray;
-import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
 
-public class ContainerSafe extends Container {
+public class ContainerBankServer extends Container {
 
     private final IInventory inventory;
     private IIntArray fields;
@@ -28,12 +22,12 @@ public class ContainerSafe extends Container {
         return fields;
     }
 
-    private TileEntitySafe tileEntitySafe;
+    private TileEntityBankServer tileEntityBankServer;
 
 
-    public ContainerSafe(int id, PlayerInventory playerInventory, PacketBuffer buffer)
+    public ContainerBankServer(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
-        this(id, playerInventory, new TileEntitySafe(), getArray(buffer));
+        this(id, playerInventory, new TileEntityBankServer(), getArray(buffer));
     }
 
     private static IIntArray getArray(PacketBuffer buffer) {
@@ -44,19 +38,19 @@ public class ContainerSafe extends Container {
         return array;
     }
 
-    public ContainerSafe(int id, PlayerInventory playerInventory, IInventory inventory, IIntArray fields)
+    public ContainerBankServer(int id, PlayerInventory playerInventory, IInventory inventory, IIntArray fields)
     {
-        super(ModContainerTypes.SAFE.get(), id);
+        super(ModContainerTypes.BANK_SERVER.get(), id);
         this.inventory = inventory;
         this.fields = fields;
-        this.tileEntitySafe = (TileEntitySafe) inventory;
+        this.tileEntityBankServer = (TileEntityBankServer) inventory;
 
-        addSafeInventory();
+        addBankServerInventory();
         addPlayerInventory(playerInventory);
 
     }
 
-    private void addSafeInventory()
+    private void addBankServerInventory()
     {
         for (int y = 0; y < 3; ++y) {
             for (int x = 0; x < 9; ++x) {
@@ -120,10 +114,8 @@ public class ContainerSafe extends Container {
         return itemstack;
     }
 
-    public void sync(Boolean isUnlocked, String correctPassword, UUID owner)
+    public void sync(UUID owner)
     {
-        tileEntitySafe.setUnlocked(isUnlocked);
-        tileEntitySafe.setCorrectPassword(correctPassword);
-        tileEntitySafe.setOwner(owner);
+        tileEntityBankServer.setOwner(owner);
     }
 }

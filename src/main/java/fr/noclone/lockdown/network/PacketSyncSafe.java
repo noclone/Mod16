@@ -8,6 +8,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class PacketSyncSafe{
@@ -16,23 +17,28 @@ public class PacketSyncSafe{
 
     private Boolean isUnlocked;
 
-    public PacketSyncSafe(Boolean isUnlocked, String correctPassword)
+    private UUID owner;
+
+    public PacketSyncSafe(Boolean isUnlocked, String correctPassword, UUID owner)
     {
         this.correctPassword = correctPassword;
         this.isUnlocked = isUnlocked;
+        this.owner = owner;
     }
 
     public static void encode(PacketSyncSafe packet, PacketBuffer buf)
     {
         buf.writeUtf(packet.correctPassword);
         buf.writeBoolean(packet.isUnlocked);
+        buf.writeUUID(packet.owner);
     }
 
     public static PacketSyncSafe decode(PacketBuffer buf)
     {
         String correctPassword = buf.readUtf();
         Boolean isUnlocked = buf.readBoolean();
-        PacketSyncSafe instance = new PacketSyncSafe(isUnlocked, correctPassword);
+        UUID owner = buf.readUUID();
+        PacketSyncSafe instance = new PacketSyncSafe(isUnlocked, correctPassword, owner);
         return instance;
     }
 
@@ -43,14 +49,20 @@ public class PacketSyncSafe{
             playerEntity = Minecraft.getInstance().player;
             if(playerEntity.containerMenu instanceof ContainerSafe)
             {
-                ((ContainerSafe) playerEntity.containerMenu).sync(packet.isUnlocked, packet.correctPassword);
+                ((ContainerSafe) playerEntity.containerMenu).sync(packet.isUnlocked, packet.correctPassword, packet.owner);
+                ctx.get().setPacketHandled(true);
+                return;
             }
         }
 
         Container container = playerEntity.containerMenu;
         if(container instanceof ContainerSafeLocked)
         {
-            ((ContainerSafeLocked) container).sync(packet.isUnlocked, packet.correctPassword);
+            ((ContainerSafeLocked) container).sync(packet.isUnlocked, packet.correctPassword, packet.owner);
+        }
+        if(container instanceof ContainerSafe)
+        {
+            ((ContainerSafe) container).sync(packet.isUnlocked, packet.correctPassword, packet.owner);
         }
         ctx.get().setPacketHandled(true);
     }

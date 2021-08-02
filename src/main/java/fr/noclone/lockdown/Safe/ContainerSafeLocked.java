@@ -14,6 +14,8 @@ import net.minecraft.util.IIntArray;
 import net.minecraft.util.IntArray;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.UUID;
+
 public class ContainerSafeLocked extends Container {
 
     private IIntArray fields;
@@ -50,9 +52,10 @@ public class ContainerSafeLocked extends Container {
         return true;
     }
 
-    public void sync(Boolean isUnlocked, String correctPassword)
+    public void sync(Boolean isUnlocked, String correctPassword, UUID owner)
     {
         tileEntitySafe.setUnlocked(isUnlocked);
         tileEntitySafe.setCorrectPassword(correctPassword);
+        tileEntitySafe.setOwner(owner);
     }
 }

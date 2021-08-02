@@ -1,8 +1,8 @@
-package fr.noclone.lockdown.Safe;
+package fr.noclone.lockdown.bankserver;
 
 import fr.noclone.lockdown.init.ModTileEntities;
 import fr.noclone.lockdown.network.Messages;
-import fr.noclone.lockdown.network.PacketSyncSafe;
+import fr.noclone.lockdown.network.PacketSyncBankServer;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,30 +33,10 @@ import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class TileEntitySafe extends LockableTileEntity implements ISidedInventory{
+public class TileEntityBankServer extends LockableTileEntity implements ISidedInventory{
 
     private NonNullList<ItemStack> items;
     private final LazyOptional<? extends IItemHandler>[] handlers;
-
-    private boolean isUnlocked = false;
-
-    public boolean isUnlocked() {
-        return isUnlocked;
-    }
-
-    public void setUnlocked(boolean unlocked) {
-        isUnlocked = unlocked;
-    }
-
-    public String getCorrectPassword() {
-        return correctPassword;
-    }
-
-    public void setCorrectPassword(String correctPassword) {
-        this.correctPassword = correctPassword;
-    }
-
-    private String correctPassword = "1234";
 
     public UUID getOwner() {
         return owner;
@@ -68,15 +48,15 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
     private UUID owner;
 
-    public TileEntitySafe() {
-        super(ModTileEntities.SAFE_TILE_ENTITY.get());
+    public TileEntityBankServer() {
+        super(ModTileEntities.BANK_SERVER_TILE_ENTITY.get());
         this.handlers = SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH);
         this.items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
 
         if(Minecraft.getInstance().player != null)
         {
             owner = Minecraft.getInstance().player.getUUID();
-            Messages.INSTANCE.sendToServer(new PacketSyncSafe(isUnlocked(), getCorrectPassword(), owner));
+            Messages.INSTANCE.sendToServer(new PacketSyncBankServer(owner));
         }
     }
 
@@ -86,8 +66,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
         this.items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
         ItemStackHelper.loadAllItems(compoundNBT, this.items);
-        correctPassword = compoundNBT.getString("correctPassword");
-        isUnlocked = compoundNBT.getBoolean("isUnlocked");
         if(owner != null && compoundNBT.contains("owner"))
             owner = compoundNBT.getUUID("owner");
     }
@@ -97,8 +75,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         super.save(compoundNBT);
 
         ItemStackHelper.saveAllItems(compoundNBT, this.items);
-        compoundNBT.putString("correctPassword", correctPassword);
-        compoundNBT.putBoolean("isUnlocked", isUnlocked);
         if(owner != null)
             compoundNBT.putUUID("owner", owner);
         return compoundNBT;
@@ -115,8 +91,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT tags = super.getUpdateTag();
-        tags.putString("correctPassword", correctPassword);
-        tags.putBoolean("isUnlocked", isUnlocked);
         if(owner != null)
             tags.putUUID("owner", owner);
         return tags;
@@ -124,16 +98,13 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
 
     @Override
     protected ITextComponent getDefaultName() {
-        return new TranslationTextComponent("Safe Lock");
+        return new TranslationTextComponent("Bank Server");
     }
 
 
     @Override
     protected Container createMenu(int id, PlayerInventory playerInventory) {
-        if(isUnlocked)
-            return new ContainerSafe(id, playerInventory, this, this.fields);
-        else
-            return new ContainerSafeLocked(id, playerInventory, this, this.fields);
+        return new ContainerBankServer(id, playerInventory, this, this.fields);
     }
 
     private final IIntArray fields = new IIntArray() {

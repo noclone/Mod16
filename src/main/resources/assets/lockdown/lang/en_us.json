@@ -5,6 +5,7 @@
 
   "block.lockdown.steel_block": "Steel Block",
   "block.lockdown.safe": "Safe",
+  "block.lockdown.bank_server": "Bank Server",
 
   "itemGroup.lockdown_tab": "LockDown"
 }

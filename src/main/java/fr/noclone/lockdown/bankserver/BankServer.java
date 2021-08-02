@@ -1,16 +1,13 @@
-package fr.noclone.lockdown.Safe;
+package fr.noclone.lockdown.bankserver;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -19,30 +16,25 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class BlockSafe extends Block {
+public class BankServer extends Block {
 
-
-    public static final BooleanProperty LOCKED = BlockStateProperties.LOCKED;
-
-    public BlockSafe() {
+    public BankServer() {
         super(AbstractBlock.Properties.of(Material.HEAVY_METAL).strength(5).harvestTool(ToolType.PICKAXE).harvestLevel(2).requiresCorrectToolForDrops());
-        this.registerDefaultState(this.getStateDefinition().any().setValue(LOCKED, Boolean.FALSE));
     }
 
     /*@Override
     public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
         TileEntity te = world.getBlockEntity(pos);
-        if(te instanceof TileEntitySafe)
+        if(te instanceof TileEntityBankServer)
         {
-            TileEntitySafe tileEntitySafe = (TileEntitySafe) te;
-            if(tileEntitySafe.getOwner() != null && tileEntitySafe.getOwner() == player.getUUID())
+            TileEntityBankServer tileEntityBankServer = (TileEntityBankServer) te;
+            if(tileEntityBankServer.getOwner() != null && tileEntityBankServer.getOwner() == player.getUUID())
                 return super.removedByPlayer(state, world, pos, player, willHarvest, fluid);
         }
         return false;
@@ -50,7 +42,7 @@ public class BlockSafe extends Block {
 
     @Override
     protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(BlockStateProperties.FACING, BlockStateProperties.LOCKED);
+        builder.add(BlockStateProperties.FACING);
     }
 
     @Nullable
@@ -66,7 +58,7 @@ public class BlockSafe extends Block {
 
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new TileEntitySafe();
+        return new TileEntityBankServer();
     }
 
     @Override
@@ -80,8 +72,8 @@ public class BlockSafe extends Block {
 
     public void interactWith(World world, BlockPos pos, PlayerEntity player) {
         TileEntity tileEntity = world.getBlockEntity(pos);
-        if (tileEntity instanceof TileEntitySafe && player instanceof ServerPlayerEntity) {
-            TileEntitySafe te = (TileEntitySafe) tileEntity;
+        if (tileEntity instanceof TileEntityBankServer && player instanceof ServerPlayerEntity) {
+            TileEntityBankServer te = (TileEntityBankServer) tileEntity;
             NetworkHooks.openGui((ServerPlayerEntity) player, te, te::encodeExtraData);
         }
     }

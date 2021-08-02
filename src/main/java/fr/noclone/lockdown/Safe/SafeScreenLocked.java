@@ -5,18 +5,27 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import fr.noclone.lockdown.LockDown;
 import fr.noclone.lockdown.network.Messages;
 import fr.noclone.lockdown.network.PacketSyncSafe;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIntArray;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.common.util.Constants;
 
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +37,14 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
     TileEntitySafe tileEntitySafe;
 
     String password = "";
+
+    TextFieldWidget box;
+
+    Boolean isOwner;
+
+    Boolean NewSet = false;
+
+    int wait = 0;
 
     public SafeScreenLocked(ContainerSafeLocked containerSafeLocked, PlayerInventory playerInventory, ITextComponent textComponent) {
         super(containerSafeLocked, playerInventory, textComponent);
@@ -44,28 +61,84 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
     @Override
     protected void init() {
         super.init();
+        if(tileEntitySafe.getOwner() != null && tileEntitySafe.getOwner() == inventory.player.getUUID())
+            isOwner = true;
+        else
+            isOwner = false;
+
         buttons.clear();
-        addButton(new Button(getGuiLeft()+63,getGuiTop()+69,18,18,new TranslationTextComponent("1"),
-                (button)->{onNumberClicked(1);}));
-        addButton(new Button(getGuiLeft()+63+18,getGuiTop()+69,18,18,new TranslationTextComponent("2"),
-                (button)->{onNumberClicked(2);}));
-        addButton(new Button(getGuiLeft()+63+18*2,getGuiTop()+69,18,18,new TranslationTextComponent("3"),
-                (button)->{onNumberClicked(3);}));
+        addButton(new Button(getGuiLeft()+63,getGuiTop()+69,18,18,new TranslationTextComponent("7"),
+                (button)->{onNumberClicked(7);}));
+        addButton(new Button(getGuiLeft()+63+18,getGuiTop()+69,18,18,new TranslationTextComponent("8"),
+                (button)->{onNumberClicked(8);}));
+        addButton(new Button(getGuiLeft()+63+18*2,getGuiTop()+69,18,18,new TranslationTextComponent("9"),
+                (button)->{onNumberClicked(9);}));
         addButton(new Button(getGuiLeft()+63,getGuiTop()+69+18,18,18,new TranslationTextComponent("4"),
                 (button)->{onNumberClicked(4);}));
         addButton(new Button(getGuiLeft()+63+18,getGuiTop()+69+18,18,18,new TranslationTextComponent("5"),
                 (button)->{onNumberClicked(5);}));
         addButton(new Button(getGuiLeft()+63+18*2,getGuiTop()+69+18,18,18,new TranslationTextComponent("6"),
                 (button)->{onNumberClicked(6);}));
-        addButton(new Button(getGuiLeft()+63,getGuiTop()+69+18*2,18,18,new TranslationTextComponent("7"),
-                (button)->{onNumberClicked(7);}));
-        addButton(new Button(getGuiLeft()+63+18,getGuiTop()+69+18*2,18,18,new TranslationTextComponent("8"),
-                (button)->{onNumberClicked(8);}));
-        addButton(new Button(getGuiLeft()+63+18*2,getGuiTop()+69+18*2,18,18,new TranslationTextComponent("9"),
-                (button)->{onNumberClicked(9);}));
+        addButton(new Button(getGuiLeft()+63,getGuiTop()+69+18*2,18,18,new TranslationTextComponent("1"),
+                (button)->{onNumberClicked(1);}));
+        addButton(new Button(getGuiLeft()+63+18,getGuiTop()+69+18*2,18,18,new TranslationTextComponent("2"),
+                (button)->{onNumberClicked(2);}));
+        addButton(new Button(getGuiLeft()+63+18*2,getGuiTop()+69+18*2,18,18,new TranslationTextComponent("3"),
+                (button)->{onNumberClicked(3);}));
         addButton(new Button(getGuiLeft()+63+18,getGuiTop()+69+18*3,18,18,new TranslationTextComponent("0"),
                 (button)->{onNumberClicked(0);}));
 
+
+        int textfieldW = 50;
+        int textfieldH = 20;
+        box = new TextFieldWidget(font,getGuiLeft()+imageWidth/2-textfieldW/2+1, getGuiTop()+textfieldH+20, textfieldW, textfieldH,new TranslationTextComponent(""));
+        box.setVisible(true);
+        box.setMaxLength(4);
+        addWidget(box);
+        addButton(new Button(box.x+box.getWidth()+5,box.y,40,20,new TranslationTextComponent("Enter"),
+                (button)->{enter();}));
+
+        addButton(new Button(box.x+box.getWidth()+5,getGuiTop()+69,18,18,new TranslationTextComponent("<-"),
+                (button)->{del();}));
+
+        if(isOwner)
+        {
+            addButton(new Button(box.x-45,box.y,40,20,new TranslationTextComponent("Set"),
+                    (button)->{setNewPassword();}));
+        }
+    }
+
+    private void del() {
+        if(!box.getValue().isEmpty())
+            box.setValue(box.getValue().substring(0, box.getValue().length()-1));
+    }
+
+    private void setNewPassword() {
+        password = box.getValue();
+        tileEntitySafe.setCorrectPassword(password);
+        SendUpdatesToServer();
+        NewSet = true;
+        wait = LocalTime.now().getSecond();
+    }
+
+    private void SendUpdatesToServer()
+    {
+        Messages.INSTANCE.sendToServer(new PacketSyncSafe(tileEntitySafe.isUnlocked(), tileEntitySafe.getCorrectPassword(), tileEntitySafe.getOwner()));
+    }
+
+    private void enter() {
+        password = box.getValue();
+        if(password.equals(tileEntitySafe.getCorrectPassword()))
+        {
+            tileEntitySafe.setUnlocked(true);
+            SendUpdatesToServer();
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.player.closeContainer();
+            minecraft.player.playSound(SoundEvents.ANVIL_BREAK,1.0f,1.0f);
+            BlockState state = minecraft.level.getBlockState(tileEntitySafe.getBlockPos());
+            minecraft.level.setBlock(tileEntitySafe.getBlockPos(), state.setValue(BlockStateProperties.LOCKED, false),
+                    Constants.BlockFlags.NOTIFY_NEIGHBORS+Constants.BlockFlags.BLOCK_UPDATE);
+        }
     }
 
     @Override
@@ -78,7 +151,15 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
         this.renderTooltip(matrixStack, x, y);
-        drawCenteredString(matrixStack, font, password+"   "+tileEntitySafe.isUnlocked(), getGuiLeft()+width/2, getGuiTop()+5, 0x52FF33);
+        if(box != null)
+            box.render(matrixStack, x, y, partialTicks);
+        if(wait != 0 && LocalTime.now().getSecond() - wait > 2)
+        {
+            wait = 0;
+            NewSet = false;
+        }
+        if(NewSet)
+            drawCenteredString(matrixStack,font,new TranslationTextComponent("New Password Set !"), getGuiLeft()+imageWidth/2, getGuiTop()+20, 0x52FF33);
     }
 
     @Override
@@ -97,11 +178,6 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
 
     private void onNumberClicked(int nb)
     {
-        password += nb;
-        if(password.equals(tileEntitySafe.getCorrectPassword()))
-        {
-            tileEntitySafe.setUnlocked(true);
-            Messages.INSTANCE.sendToServer(new PacketSyncSafe(tileEntitySafe.isUnlocked(), tileEntitySafe.getCorrectPassword()));
-        }
+        box.insertText(nb+"");
     }
 }

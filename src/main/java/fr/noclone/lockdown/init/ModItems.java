@@ -14,5 +14,5 @@ public class ModItems {
     public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register("steel_ingot",()->new Item(new Item.Properties()
             .tab(LockDown.LOCKDOWN_TAB)));
     public static final RegistryObject<Item> STEEL_BAR = ITEMS.register("steel_bar",()->new Item(new Item.Properties()
-            .stacksTo(4).tab(LockDown.LOCKDOWN_TAB)));
+            .tab(LockDown.LOCKDOWN_TAB)));
 }

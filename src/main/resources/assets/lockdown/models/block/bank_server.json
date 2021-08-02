@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "lockdown:block/bank_server",
+    "down": "lockdown:block/bank_server_bottom",
+    "up": "lockdown:block/bank_server_top",
+    "north": "lockdown:block/bank_server",
+    "south": "lockdown:block/bank_server_side",
+    "east": "lockdown:block/bank_server_side",
+    "west": "lockdown:block/bank_server_side"
+  }
+}

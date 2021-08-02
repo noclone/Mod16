@@ -11,6 +11,8 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
+import java.util.UUID;
+
 public class Messages {
 
     private static final String PROTOCOL_VERSION = "1";
@@ -28,15 +30,22 @@ public class Messages {
                 .decoder(PacketSyncSafe::decode)
                 .consumer(PacketSyncSafe::handle)
                 .add();
+
+        INSTANCE.messageBuilder(PacketSyncBankServer.class, 0)
+                .encoder(PacketSyncBankServer::encode)
+                .decoder(PacketSyncBankServer::decode)
+                .consumer(PacketSyncBankServer::handle)
+                .add();
+
     }
 
-    public static void sendToPlayer(ServerPlayerEntity player, boolean isUnlocked, String correctPassword)
+    public static void sendToPlayer(ServerPlayerEntity player, boolean isUnlocked, String correctPassword, UUID owner)
     {
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new PacketSyncSafe(isUnlocked, correctPassword));
+        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new PacketSyncSafe(isUnlocked, correctPassword, owner));
     }
 
-    public static void sendToEveryone(boolean isUnlocked, String correctPassword)
+    public static void sendToEveryone(boolean isUnlocked, String correctPassword, UUID owner)
     {
-        INSTANCE.send(PacketDistributor.ALL.noArg(), new PacketSyncSafe(isUnlocked, correctPassword));
+        INSTANCE.send(PacketDistributor.ALL.noArg(), new PacketSyncSafe(isUnlocked, correctPassword, owner));
     }
 }

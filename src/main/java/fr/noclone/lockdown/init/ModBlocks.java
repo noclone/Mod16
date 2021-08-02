@@ -2,6 +2,7 @@ package fr.noclone.lockdown.init;
 
 import fr.noclone.lockdown.LockDown;
 import fr.noclone.lockdown.Safe.BlockSafe;
+import fr.noclone.lockdown.bankserver.BankServer;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -19,9 +20,11 @@ public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, LockDown.MODID);
 
     public static final RegistryObject<Block> STEEL_BLOCK = createBlock("steel_block",
-            ()->new Block(AbstractBlock.Properties.of(Material.HEAVY_METAL).strength(3).harvestTool(ToolType.PICKAXE).harvestLevel(2).requiresCorrectToolForDrops()));
+            ()->new Block(AbstractBlock.Properties.of(Material.HEAVY_METAL).strength(20).harvestTool(ToolType.PICKAXE).harvestLevel(3).requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Block> SAFE = createBlock("safe", BlockSafe::new);
+
+    public static final RegistryObject<Block> BANK_SERVER = createBlock("bank_server", BankServer::new);
 
     public static RegistryObject<Block> createBlock(String name, Supplier<? extends Block> supplier)
     {

@@ -4,7 +4,7 @@
     "particle": "lockdown:block/safe",
     "down": "lockdown:block/safe_bottom",
     "up": "lockdown:block/safe_top",
-    "north": "lockdown:block/safe",
+    "north": "lockdown:block/safe_locked",
     "south": "lockdown:block/safe_side",
     "east": "lockdown:block/safe_side",
     "west": "lockdown:block/safe_side"
