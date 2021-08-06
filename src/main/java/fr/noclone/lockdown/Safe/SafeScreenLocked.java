@@ -3,6 +3,7 @@ package fr.noclone.lockdown.Safe;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.noclone.lockdown.LockDown;
+import fr.noclone.lockdown.bankserver.TileEntityBankServer;
 import fr.noclone.lockdown.network.Messages;
 import fr.noclone.lockdown.network.PacketSyncSafe;
 import net.minecraft.block.BlockState;
@@ -40,9 +41,9 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
 
     TextFieldWidget box;
 
-    Boolean isOwner;
+    boolean isOwner;
 
-    Boolean NewSet = false;
+    boolean NewSet = false;
 
     int wait = 0;
 
@@ -52,19 +53,19 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
         this.containerSafeLocked = containerSafeLocked;
 
         IIntArray fields = containerSafeLocked.getFields();
-
         TileEntity te = Minecraft.getInstance().level.getBlockEntity(new BlockPos(fields.get(1),fields.get(2),fields.get(3)));
         if(te instanceof TileEntitySafe)
             tileEntitySafe = (TileEntitySafe) te;
+
+        tileEntitySafe.setOwner(containerSafeLocked.getTileEntitySafe().getOwner());
+
+        if(tileEntitySafe.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+            isOwner = true;
     }
 
     @Override
     protected void init() {
         super.init();
-        if(tileEntitySafe.getOwner() != null && tileEntitySafe.getOwner() == inventory.player.getUUID())
-            isOwner = true;
-        else
-            isOwner = false;
 
         buttons.clear();
         addButton(new Button(getGuiLeft()+63,getGuiTop()+69,18,18,new TranslationTextComponent("7"),

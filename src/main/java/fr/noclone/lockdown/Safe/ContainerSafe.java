@@ -33,7 +33,13 @@ public class ContainerSafe extends Container {
 
     public ContainerSafe(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
-        this(id, playerInventory, new TileEntitySafe(), getArray(buffer));
+        this(id, playerInventory, getTileEntity(buffer), getArray(buffer));
+    }
+
+    private static TileEntitySafe getTileEntity(PacketBuffer buffer) {
+        TileEntitySafe tileEntitySafe = new TileEntitySafe();
+        tileEntitySafe.setOwner(buffer.readUUID());
+        return tileEntitySafe;
     }
 
     private static IIntArray getArray(PacketBuffer buffer) {

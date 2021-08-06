@@ -1,11 +1,16 @@
 package fr.noclone.lockdown.Safe;
 
 import fr.noclone.lockdown.init.ModContainerTypes;
+import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketSyncSafe;
 import jdk.nashorn.internal.ir.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.IContainerListener;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -13,7 +18,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.IntArray;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.network.NetworkDirection;
 
+import java.nio.charset.MalformedInputException;
 import java.util.UUID;
 
 public class ContainerSafeLocked extends Container {
@@ -24,12 +31,15 @@ public class ContainerSafeLocked extends Container {
         return fields;
     }
 
-    private TileEntitySafe tileEntitySafe;
+    public TileEntitySafe getTileEntitySafe() {
+        return tileEntitySafe;
+    }
 
+    private TileEntitySafe tileEntitySafe;
 
     public ContainerSafeLocked(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
-        this(id, playerInventory, new TileEntitySafe(), getArray(buffer));
+        this(id, playerInventory, getTileEntity(buffer), getArray(buffer));
     }
 
     private static IIntArray getArray(PacketBuffer buffer) {
@@ -39,6 +49,13 @@ public class ContainerSafeLocked extends Container {
         array.set(3,buffer.readInt());
         return array;
     }
+
+    private static TileEntitySafe getTileEntity(PacketBuffer buffer) {
+        TileEntitySafe tileEntitySafe = new TileEntitySafe();
+        tileEntitySafe.setOwner(buffer.readUUID());
+        return tileEntitySafe;
+    }
+
 
     public ContainerSafeLocked(int id, PlayerInventory playerInventory, TileEntitySafe tileEntitySafe, IIntArray fields)
     {

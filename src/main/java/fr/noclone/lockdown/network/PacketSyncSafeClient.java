@@ -3,18 +3,15 @@ import fr.noclone.lockdown.Safe.ContainerSafe;
 import fr.noclone.lockdown.Safe.ContainerSafeLocked;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.MerchantInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class PacketSyncSafe{
+public class PacketSyncSafeClient {
 
     private String correctPassword;
 
@@ -22,33 +19,33 @@ public class PacketSyncSafe{
 
     private UUID owner;
 
-    public PacketSyncSafe(Boolean isUnlocked, String correctPassword, UUID owner)
+    public PacketSyncSafeClient(Boolean isUnlocked, String correctPassword, UUID owner)
     {
         this.correctPassword = correctPassword;
         this.isUnlocked = isUnlocked;
         this.owner = owner;
     }
 
-    public static void encode(PacketSyncSafe packet, PacketBuffer buf)
+    public static void encode(PacketSyncSafeClient packet, PacketBuffer buf)
     {
         buf.writeUtf(packet.correctPassword);
         buf.writeBoolean(packet.isUnlocked);
         buf.writeUUID(packet.owner);
     }
 
-    public static PacketSyncSafe decode(PacketBuffer buf)
+    public static PacketSyncSafeClient decode(PacketBuffer buf)
     {
         String correctPassword = buf.readUtf();
         Boolean isUnlocked = buf.readBoolean();
         UUID owner = buf.readUUID();
-        PacketSyncSafe instance = new PacketSyncSafe(isUnlocked, correctPassword, owner);
+        PacketSyncSafeClient instance = new PacketSyncSafeClient(isUnlocked, correctPassword, owner);
         return instance;
     }
 
-    public static void handle(PacketSyncSafe packet, Supplier<NetworkEvent.Context> ctx)
+    public static void handle(PacketSyncSafeClient packet, Supplier<NetworkEvent.Context> ctx)
     {
         ctx.get().enqueueWork(() -> {
-            PlayerEntity playerEntity = ctx.get().getSender();
+            PlayerEntity playerEntity = Minecraft.getInstance().player;
 
             if(playerEntity != null)
             {

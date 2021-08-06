@@ -52,12 +52,6 @@ public class TileEntityBankServer extends LockableTileEntity implements ISidedIn
         super(ModTileEntities.BANK_SERVER_TILE_ENTITY.get());
         this.handlers = SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH);
         this.items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
-
-        if(Minecraft.getInstance().player != null)
-        {
-            owner = Minecraft.getInstance().player.getUUID();
-            Messages.INSTANCE.sendToServer(new PacketSyncBankServer(owner));
-        }
     }
 
     @Override

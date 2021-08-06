@@ -1,9 +1,13 @@
 package fr.noclone.lockdown.Safe;
 
+import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketSyncSafe;
+import fr.noclone.lockdown.network.PacketSyncSafeClient;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -22,10 +26,16 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkHooks;
+import org.lwjgl.system.windows.MSG;
 
 import javax.annotation.Nullable;
 
+@Mod.EventBusSubscriber
 public class BlockSafe extends Block {
 
 
@@ -35,18 +45,6 @@ public class BlockSafe extends Block {
         super(AbstractBlock.Properties.of(Material.HEAVY_METAL).strength(5).harvestTool(ToolType.PICKAXE).harvestLevel(2).requiresCorrectToolForDrops());
         this.registerDefaultState(this.getStateDefinition().any().setValue(LOCKED, Boolean.FALSE));
     }
-
-    /*@Override
-    public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
-        TileEntity te = world.getBlockEntity(pos);
-        if(te instanceof TileEntitySafe)
-        {
-            TileEntitySafe tileEntitySafe = (TileEntitySafe) te;
-            if(tileEntitySafe.getOwner() != null && tileEntitySafe.getOwner() == player.getUUID())
-                return super.removedByPlayer(state, world, pos, player, willHarvest, fluid);
-        }
-        return false;
-    }*/
 
     @Override
     protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
@@ -83,6 +81,31 @@ public class BlockSafe extends Block {
         if (tileEntity instanceof TileEntitySafe && player instanceof ServerPlayerEntity) {
             TileEntitySafe te = (TileEntitySafe) tileEntity;
             NetworkHooks.openGui((ServerPlayerEntity) player, te, te::encodeExtraData);
+            Messages.INSTANCE.sendTo(new PacketSyncSafeClient(te.isUnlocked(), te.getCorrectPassword(), te.getOwner()), ((ServerPlayerEntity) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockBreak(BlockEvent.BreakEvent event){
+        TileEntity te = event.getWorld().getBlockEntity(event.getPos());
+        if(te instanceof TileEntitySafe)
+        {
+            TileEntitySafe tileEntitySafe = (TileEntitySafe) te;
+            if(tileEntitySafe.getOwner() != null && !tileEntitySafe.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+                event.setCanceled(true);
+        }
+    }
+
+    @Override
+    public void onPlace(BlockState p_220082_1_, World world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
+        super.onPlace(p_220082_1_, world, pos, p_220082_4_, p_220082_5_);
+        TileEntity tileEntity = world.getBlockEntity(pos);
+        if (tileEntity instanceof TileEntitySafe) {
+            TileEntitySafe te = (TileEntitySafe) tileEntity;
+            if(te.getOwner() == null)
+            {
+                te.setOwner(Minecraft.getInstance().player.getUUID());
+            }
         }
     }
 }

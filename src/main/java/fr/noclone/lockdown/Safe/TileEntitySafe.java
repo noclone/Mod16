@@ -13,6 +13,7 @@ import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -72,12 +73,6 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         super(ModTileEntities.SAFE_TILE_ENTITY.get());
         this.handlers = SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH);
         this.items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
-
-        if(Minecraft.getInstance().player != null)
-        {
-            owner = Minecraft.getInstance().player.getUUID();
-            Messages.INSTANCE.sendToServer(new PacketSyncSafe(isUnlocked(), getCorrectPassword(), owner));
-        }
     }
 
     @Override
@@ -88,7 +83,7 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
         ItemStackHelper.loadAllItems(compoundNBT, this.items);
         correctPassword = compoundNBT.getString("correctPassword");
         isUnlocked = compoundNBT.getBoolean("isUnlocked");
-        if(owner != null && compoundNBT.contains("owner"))
+        if(compoundNBT.contains("owner"))
             owner = compoundNBT.getUUID("owner");
     }
 
@@ -170,6 +165,7 @@ public class TileEntitySafe extends LockableTileEntity implements ISidedInventor
     };
 
     void encodeExtraData(PacketBuffer buffer) {
+        buffer.writeUUID(owner);
         buffer.writeByte(fields.getCount());
         buffer.writeInt(getBlockPos().getX());
         buffer.writeInt(getBlockPos().getY());
