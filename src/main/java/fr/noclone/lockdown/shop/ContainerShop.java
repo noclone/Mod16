@@ -5,7 +5,9 @@ import fr.noclone.lockdown.clearer.TileEntityClearer;
 import fr.noclone.lockdown.creditcard.CreditCard;
 import fr.noclone.lockdown.init.ModContainerTypes;
 import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketBuyItem;
 import fr.noclone.lockdown.network.PacketChangeGhost;
+import fr.noclone.lockdown.network.PacketLinkShopCard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,6 +25,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +54,14 @@ public class ContainerShop extends Container{
     }
 
     private PlayerInventory playerInventory;
+
+    public boolean displayLinked = false;
+
+    public boolean OwnerMode = false;
+
+    public boolean AdminMode = false;
+
+    public int time = 0;
 
 
     public ContainerShop(int id, PlayerInventory playerInventory, PacketBuffer buffer)
@@ -93,8 +105,28 @@ public class ContainerShop extends Container{
             @Override
             public boolean mayPlace(ItemStack stack) {
                 if(stack.getItem() instanceof CreditCard && stack.hasTag() && stack.getTag().contains("balance"))
+                {
                     return true;
+                }
                 return false;
+            }
+
+            @Override
+            public ItemStack onTake(PlayerEntity p_190901_1_, ItemStack p_190901_2_) {
+                time = 0;
+                displayLinked = false;
+                return super.onTake(p_190901_1_, p_190901_2_);
+            }
+
+            @Override
+            public void set(ItemStack stack) {
+                super.set(stack);
+
+                if(OwnerMode && stack.getItem() instanceof CreditCard && stack.hasTag() && stack.getTag().contains("balance"))
+                {
+                    Messages.INSTANCE.sendToServer(new PacketLinkShopCard(tileEntityShop.getBlockPos()));
+                    displayLinked = true;
+                }
             }
         });
 
@@ -106,7 +138,7 @@ public class ContainerShop extends Container{
                 this.addSlot(new Slot(inventory, index, posX, posY){
                     @Override
                     public boolean mayPlace(ItemStack stack) {
-                        if(!tileEntityShop.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+                        if(!OwnerMode)
                             return false;
                         Messages.INSTANCE.sendToServer(new PacketChangeGhost(tileEntityShop.getBlockPos(), index, true, stack));
                         return false;

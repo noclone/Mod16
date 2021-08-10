@@ -3,6 +3,7 @@ package fr.noclone.lockdown.creditcard;
 import fr.noclone.lockdown.bankserver.TileEntityBankServer;
 import fr.noclone.lockdown.clearer.TileEntityClearer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -30,7 +31,6 @@ import java.util.UUID;
 import static fr.noclone.lockdown.utils.Utils.formatInt;
 
 public class CreditCard extends Item {
-
 
     public CreditCard(Properties properties) {
         super(properties);
@@ -75,20 +75,30 @@ public class CreditCard extends Item {
                     }
                     if(i == TileEntityBankServer.MAX_CARDS-1)
                     {
-                        if(tag.contains("owner"))
-                            tag.remove("owner");
-                        if(tag.contains("balance"))
-                            tag.remove("balance");
-                        if(tag.contains("serverX"))
-                        {
-                            tag.remove("serverX");
-                            tag.remove("serverY");
-                            tag.remove("serverZ");
-                        }
+                        itemStack.setTag(Unlink(itemStack.getTag()));
                     }
                 }
             }
+            else
+            {
+                itemStack.setTag(Unlink(itemStack.getTag()));
+            }
         }
+    }
+
+    private CompoundNBT Unlink(CompoundNBT tag)
+    {
+        if(tag.contains("owner"))
+            tag.remove("owner");
+        if(tag.contains("balance"))
+            tag.remove("balance");
+        if(tag.contains("serverX"))
+        {
+            tag.remove("serverX");
+            tag.remove("serverY");
+            tag.remove("serverZ");
+        }
+        return tag;
     }
 
     @Override
@@ -113,8 +123,9 @@ public class CreditCard extends Item {
                     }
                 }
             }
+            String amount = Screen.hasShiftDown() ? itemStack.getTag().getInt("balance")+"" : formatInt(itemStack.getTag().getInt("balance"));
             if(tag.contains("balance"))
-                tooltip.add(new TranslationTextComponent(TextFormatting.AQUA+"Balance : "+TextFormatting.GOLD+formatInt(itemStack.getTag().getInt("balance"))+"$"));
+                tooltip.add(new TranslationTextComponent(TextFormatting.AQUA+"Balance : "+TextFormatting.GOLD+amount+"$"));
             if(tag.contains("owner"))
                 tooltip.add(new TranslationTextComponent(TextFormatting.BLUE+"Owner : "+TextFormatting.DARK_AQUA+world.getPlayerByUUID(tag.getUUID("owner")).getScoreboardName()));
             if(tag.contains("banker"))

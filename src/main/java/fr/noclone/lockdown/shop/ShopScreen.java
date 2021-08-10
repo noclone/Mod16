@@ -6,8 +6,7 @@ import fr.noclone.lockdown.LockDown;
 import fr.noclone.lockdown.clearer.ContainerClearer;
 import fr.noclone.lockdown.clearer.TileEntityClearer;
 import fr.noclone.lockdown.creditcard.CreditCard;
-import fr.noclone.lockdown.network.Messages;
-import fr.noclone.lockdown.network.PacketChangeGhost;
+import fr.noclone.lockdown.network.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -31,6 +30,9 @@ import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Mod.EventBusSubscriber
 public class ShopScreen extends ContainerScreen<ContainerShop> {
@@ -49,6 +51,11 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
 
     Slot selectedSlot;
 
+
+
+
+    List<Button> buttonList = new ArrayList<>();
+
     public ShopScreen(ContainerShop containerShop, PlayerInventory playerInventory, ITextComponent textComponent) {
         super(containerShop, playerInventory, textComponent);
 
@@ -66,29 +73,65 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
     protected void init() {
         super.init();
 
-        if(tileEntityShop.getOwner().equals(Minecraft.getInstance().player.getUUID()))
-        {
-            buttons.clear();
-            addButton(new Button(getGuiLeft()+8,getGuiTop()+22, 18, 18, new TranslationTextComponent("-")
-                    , (button)->{PlusMinus(-1);}));
-            addButton(new Button(getGuiLeft()+72,getGuiTop()+22, 18, 18, new TranslationTextComponent("+")
-                    , (button)->{PlusMinus(1);}));
+        buttonList.add(new Button(getGuiLeft() + 8, getGuiTop() + 21, 18, 18, new TranslationTextComponent("-")
+                , (button) -> { PlusMinus(-1); }));
+        buttonList.add(new Button(getGuiLeft() + 72, getGuiTop() + 21, 18, 18, new TranslationTextComponent("+")
+                , (button) -> { PlusMinus(1); }));
+        buttons.clear();
+        addButton(buttonList.get(0));
+        addButton(buttonList.get(1));
+        int textfieldW = 44;
+        int textfieldH = 18;
+        box = new TextFieldWidget(font, getGuiLeft() + 27, getGuiTop() + 21, textfieldW, textfieldH, new TranslationTextComponent(""));
+        box.setVisible(false);
+        box.setValue("0");
+        box.setMaxLength(9);
+        addWidget(box);
 
-            int textfieldW = 44;
-            int textfieldH = 18;
-            box = new TextFieldWidget(font,getGuiLeft()+27, getGuiTop()+22, textfieldW, textfieldH,new TranslationTextComponent(""));
-            box.setVisible(true);
-            box.setValue("0");
-            addWidget(box);
 
+        buttonList.add(new Button(getGuiLeft() + 95, getGuiTop() + 21, 30, 18, new TranslationTextComponent("Set")
+                , (button) -> { SetPrice(); }));
+        addButton(buttonList.get(2));
 
-            addButton(new Button(getGuiLeft()+95,getGuiTop()+22, 30, 18, new TranslationTextComponent("Set")
-                    , (button)->{SetPrice();}));
+        buttonList.add(new Button(getGuiLeft()-19, getGuiTop(), 18, 18, new TranslationTextComponent("O")
+                , (button) -> { SwapOwnerMode(); }));
+        addButton(buttonList.get(3));
 
-        }
+        buttonList.add(new Button(getGuiLeft()-19, getGuiTop() + 19, 18, 18, new TranslationTextComponent("I")
+                , (button) -> { SwapInfiniteMode(); }));
+
+        addButton(buttonList.get(4));
+
+        buttonList.get(0).visible = false;
+        buttonList.get(1).visible = false;
+        buttonList.get(2).visible = false;
+        buttonList.get(3).visible = false;
+        buttonList.get(4).visible = false;
+
     }
 
+    private void SwapInfiniteMode() {
+        containerShop.AdminMode = !containerShop.AdminMode;
+        Messages.INSTANCE.sendToServer(new PacketShopAdminMode(tileEntityShop.getBlockPos(), containerShop.AdminMode));
+    }
 
+    private void SwapOwnerMode() {
+        if(containerShop.OwnerMode)
+        {
+            containerShop.OwnerMode = false;
+            for (int i = 0; i < 3; i++) {
+                buttonList.get(i).visible = false;
+            }
+            box.visible = false;
+        }
+        else {
+            containerShop.OwnerMode = true;
+            for (int i = 0; i < 3; i++) {
+                buttonList.get(i).visible = true;
+            }
+            box.visible = true;
+        }
+    }
 
 
     private void PlusMinus(int add) {
@@ -121,11 +164,19 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
+        if(tileEntityShop.getOwner().equals(Minecraft.getInstance().player.getUUID()) && !buttonList.get(3).visible)
+            buttonList.get(3).visible = true;
+
+        if(Minecraft.getInstance().player.isCreative() && !buttonList.get(4).visible)
+            buttonList.get(4).visible = true;
 
         if(box != null)
             box.render(matrixStack, x, y, partialTicks);
-
-
+        if(containerShop.displayLinked && containerShop.time < 100)
+        {
+            drawCenteredString(matrixStack,font, TextFormatting.GREEN+"Account Linked !",  getGuiLeft()+containerShop.getSlot(0).x-10, getGuiTop()+containerShop.getSlot(0).y + 25, 0xFFFFFF);
+            containerShop.time+=1;
+        }
 
         this.renderTooltip(matrixStack, x, y);
     }
@@ -133,7 +184,7 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
     private void SetPrice() {
         if(selectedSlot == null || !IsValid())
             return;
-        selectedSlot.getItem().getTag().putInt("price", Integer.parseInt(box.getValue()));
+        Messages.INSTANCE.sendToServer(new PacketPriceChanged(tileEntityShop.getBlockPos(), selectedSlot.index, Integer.parseInt(box.getValue())));
     }
 
     private void drawSelectedSlot(MatrixStack matrixStack) {
@@ -146,20 +197,25 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
 
     @Override
     protected void slotClicked(Slot slot, int index, int clicknb, ClickType type) {
-        if(slot == null)
+        super.slotClicked(slot, index, clicknb, type);
+
+        if(slot == null || slot.getItem().isEmpty())
             return;
-        if(tileEntityShop.getOwner().equals(Minecraft.getInstance().player.getUUID()) && clicknb == 1 && slot.getItem().hasTag() && slot.getItem().getTag().contains("price"))
+
+        if(containerShop.OwnerMode && clicknb == 1 && slot.getItem().hasTag() && slot.getItem().getTag().contains("price"))
         {
             xPos = slot.x;
             yPos = slot.y;
             selectedSlot = slot;
             box.setValue(slot.getItem().getTag().getInt("price")+"");
         }
-        if(tileEntityShop.getOwner().equals(Minecraft.getInstance().player.getUUID()) && clicknb == 0 && slot.getItem().hasTag() && slot.getItem().getTag().contains("price"))
+        if(containerShop.OwnerMode && clicknb == 0 && slot.getItem().hasTag() && slot.getItem().getTag().contains("price"))
         {
+            selectedSlot = null;
             Messages.INSTANCE.sendToServer(new PacketChangeGhost(tileEntityShop.getBlockPos(), index, false, ItemStack.EMPTY));
         }
-        super.slotClicked(slot, index, clicknb, type);
+        if(!containerShop.OwnerMode && clicknb == 0 && slot.getItem().hasTag() && slot.getItem().getTag().contains("price"))
+            Messages.INSTANCE.sendToServer(new PacketBuyItem(tileEntityShop.getBlockPos(), index, hasShiftDown()));
     }
 
     @Override
@@ -180,9 +236,8 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
         drawSelectedSlot(matrixStack);
     }
 
-
     @SubscribeEvent
-    public void tooltip(ItemTooltipEvent event)
+    public static void tooltip(ItemTooltipEvent event)
     {
         ItemStack stack = event.getItemStack();
         if(stack.hasTag() && stack.getTag().contains("price"))

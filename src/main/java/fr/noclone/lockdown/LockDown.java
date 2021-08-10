@@ -6,9 +6,11 @@ import fr.noclone.lockdown.init.ModContainerTypes;
 import fr.noclone.lockdown.init.ModItems;
 import fr.noclone.lockdown.init.ModTileEntities;
 import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.commands.ModCommands;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -38,6 +40,8 @@ public class LockDown {
         ModBlocks.BLOCKS.register(bus);
         ModTileEntities.TILE_ENTITIES.register(bus);
         ModContainerTypes.CONTAINERS.register(bus);
+
+        MinecraftForge.EVENT_BUS.register(ModCommands.class);
     }
 
     private void setup(FMLCommonSetupEvent e)

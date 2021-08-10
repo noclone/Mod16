@@ -298,7 +298,8 @@ public class TileEntityBankServer extends LockableTileEntity implements ISidedIn
     public void tick() {
         if(!level.isClientSide)
         {
-            for(int i = 0; i < 3; i++)
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+           /* for(int i = 0; i < 3; i++)
             {
                 ItemStack card = cards.get(i);
                 if(!card.isEmpty())
@@ -309,7 +310,7 @@ public class TileEntityBankServer extends LockableTileEntity implements ISidedIn
                         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -356,6 +357,35 @@ public class TileEntityBankServer extends LockableTileEntity implements ISidedIn
                 items.set(0,ItemStack.EMPTY);
                 ItemStackHelper.saveAllItems(getUpdateTag(), items);
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+        }
+    }
+
+    public void CopyCard(int x) {
+        if(!owner.equals(Minecraft.getInstance().player.getUUID()))
+            return;
+        ItemStack item = items.get(0).copy();
+        ItemStack account = cards.get(x);
+        if(item.getItem() instanceof CreditCard)
+        {
+            if(!item.hasTag())
+            {
+                item.setTag(new CompoundNBT());
+                item.getTag().putUUID("banker", account.getTag().getUUID("banker"));
+            }
+            if(!item.getTag().contains("owner"))
+            {
+                item.getTag().putUUID("owner",account.getTag().getUUID("owner"));
+                item.getTag().putInt("balance",account.getTag().getInt("balance"));
+                item.getTag().putInt("serverX", account.getTag().getInt("serverX"));
+                item.getTag().putInt("serverY", account.getTag().getInt("serverY"));
+                item.getTag().putInt("serverZ", account.getTag().getInt("serverZ"));
+                item.getTag().putUUID("id", account.getTag().getUUID("id"));
+
+
+                items.set(1,item.copy());
+                items.set(0,ItemStack.EMPTY);
+                ItemStackHelper.saveAllItems(getUpdateTag(), items);
             }
         }
     }

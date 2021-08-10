@@ -79,7 +79,7 @@ public class Shop extends Block {
             TileEntityShop tileentityshop = (TileEntityShop) te;
             if(tileentityshop.getOwner() != null && !tileentityshop.getOwner().equals(Minecraft.getInstance().player.getUUID()))
                     event.setCanceled(true);
-            InventoryHelper.dropContents(te.getLevel(),te.getBlockPos(), tileentityshop);
+            InventoryHelper.dropItemStack(te.getLevel(),te.getBlockPos().getX(), te.getBlockPos().getY(),te.getBlockPos().getZ(), tileentityshop.getItem(0));
         }
     }
 

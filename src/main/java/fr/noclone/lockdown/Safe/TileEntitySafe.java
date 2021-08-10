@@ -36,6 +36,14 @@ import java.util.UUID;
 
 public class TileEntitySafe extends LockableTileEntity implements ISidedInventory{
 
+    public NonNullList<ItemStack> getItems() {
+        return items;
+    }
+
+    public void setItems(NonNullList<ItemStack> items) {
+        this.items = items;
+    }
+
     private NonNullList<ItemStack> items;
     private final LazyOptional<? extends IItemHandler>[] handlers;
 

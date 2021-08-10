@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.noclone.lockdown.LockDown;
 import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketCopyCard;
 import fr.noclone.lockdown.network.PacketDeleteCard;
 import fr.noclone.lockdown.network.PacketLinkCard;
 import net.minecraft.client.Minecraft;
@@ -68,6 +69,20 @@ public class BankServerScreen extends ContainerScreen<ContainerBankServer> {
         addButton(buttonList.get(0));
         addButton(buttonList.get(1));
         addButton(buttonList.get(2));
+
+        buttonList.add(new Button(getGuiLeft()+90,posY+20+10, 8, 8, new TranslationTextComponent("C"), (button)->{CopyCard(0);}));
+        buttonList.add(new Button(getGuiLeft()+90,posY+20+20, 8, 8, new TranslationTextComponent("C"), (button)->{CopyCard(1);}));
+        buttonList.add(new Button(getGuiLeft()+90,posY+20+30, 8, 8, new TranslationTextComponent("C"), (button)->{CopyCard(2);}));
+        buttonList.get(3).visible = false;
+        buttonList.get(4).visible = false;
+        buttonList.get(5).visible = false;
+        addButton(buttonList.get(3));
+        addButton(buttonList.get(4));
+        addButton(buttonList.get(5));
+    }
+
+    private void CopyCard(int i) {
+        Messages.INSTANCE.sendToServer(new PacketCopyCard(tileEntityBankServer.getBlockPos(),i));
     }
 
     private void DeleteCard(int i) {
@@ -95,10 +110,12 @@ public class BankServerScreen extends ContainerScreen<ContainerBankServer> {
                 font.draw(matrixStack,TextFormatting.GRAY+"Acc "+i+": "
                         +TextFormatting.DARK_GREEN+tileEntityBankServer.getLevel().getPlayerByUUID(tag.getUUID("owner")).getScoreboardName()+" "
                         +TextFormatting.GOLD+formatInt(tag.getInt("balance"))+" $", posX + 5,posY+20+10*(i+1), 0xFFFFFF);
-                buttonList.get(i).visible = true;
+                if(tileEntityBankServer.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+                {
+                    buttonList.get(i).visible = true;
+                    buttonList.get(i+3).visible = true;
+                }
             }
-            else
-                buttonList.get(i).visible = false;
         }
 
         this.renderTooltip(matrixStack, x, y);
