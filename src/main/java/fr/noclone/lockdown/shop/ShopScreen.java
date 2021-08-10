@@ -33,8 +33,7 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@Mod.EventBusSubscriber
+@OnlyIn(Dist.CLIENT)
 public class ShopScreen extends ContainerScreen<ContainerShop> {
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(LockDown.MODID, "textures/gui/shop.png");
@@ -234,15 +233,5 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
 
 
         drawSelectedSlot(matrixStack);
-    }
-
-    @SubscribeEvent
-    public static void tooltip(ItemTooltipEvent event)
-    {
-        ItemStack stack = event.getItemStack();
-        if(stack.hasTag() && stack.getTag().contains("price"))
-        {
-            event.getToolTip().add(new TranslationTextComponent(TextFormatting.GOLD+""+stack.getTag().getInt("price")+"$"));
-        }
     }
 }

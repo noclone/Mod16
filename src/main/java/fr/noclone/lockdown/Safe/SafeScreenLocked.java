@@ -23,13 +23,15 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@OnlyIn(Dist.CLIENT)
 public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
     public static final ResourceLocation LOCKED = new ResourceLocation(LockDown.MODID, "textures/gui/safe_lock.png");
 

@@ -18,8 +18,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-
+@OnlyIn(Dist.CLIENT)
 public class ClearerScreen extends ContainerScreen<ContainerClearer> {
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(LockDown.MODID, "textures/gui/clearer.png");

@@ -10,6 +10,7 @@ import fr.noclone.lockdown.commands.ModCommands;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -54,6 +55,8 @@ public class LockDown {
 
     }
 
+
+
     @Mod.EventBusSubscriber(modid = LockDown.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class Client{
         @SubscribeEvent
@@ -61,6 +64,5 @@ public class LockDown {
         {
             ModContainerTypes.registerScreens(event);
         }
-
     }
 }
