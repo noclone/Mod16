@@ -1,6 +1,9 @@
 package fr.noclone.lockdown.bankserver;
 
+import fr.noclone.lockdown.creditcard.CreditCard;
 import fr.noclone.lockdown.init.ModContainerTypes;
+import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketSyncBankServer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
@@ -10,12 +13,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.IntArray;
+import net.minecraft.util.NonNullList;
 
 import java.util.UUID;
 
 public class ContainerBankServer extends Container {
 
+    public IInventory getInventory() {
+        return inventory;
+    }
+
     private final IInventory inventory;
+
+
     private IIntArray fields;
 
     public IIntArray getFields() {
@@ -24,10 +34,22 @@ public class ContainerBankServer extends Container {
 
     private TileEntityBankServer tileEntityBankServer;
 
+    public PlayerInventory getPlayerInventory() {
+        return playerInventory;
+    }
+
+    private PlayerInventory playerInventory;
+
 
     public ContainerBankServer(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
-        this(id, playerInventory, new TileEntityBankServer(), getArray(buffer));
+        this(id, playerInventory, getTileEntity(buffer), getArray(buffer));
+    }
+
+    private static TileEntityBankServer getTileEntity(PacketBuffer buffer) {
+        TileEntityBankServer tileEntityBankServer = new TileEntityBankServer();
+        tileEntityBankServer.setOwner(buffer.readUUID());
+        return tileEntityBankServer;
     }
 
     private static IIntArray getArray(PacketBuffer buffer) {
@@ -44,27 +66,36 @@ public class ContainerBankServer extends Container {
         this.inventory = inventory;
         this.fields = fields;
         this.tileEntityBankServer = (TileEntityBankServer) inventory;
+        this.playerInventory = playerInventory;
 
         addBankServerInventory();
         addPlayerInventory(playerInventory);
-
     }
 
     private void addBankServerInventory()
     {
-        for (int y = 0; y < 3; ++y) {
-            for (int x = 0; x < 9; ++x) {
-                int index = x + y * 9;
-                int posX = 8 + x * 18;
-                int posY = 18 + y * 18;
-                this.addSlot(new Slot(this.inventory, index, posX, posY));
+        this.addSlot(new Slot(this.inventory, 0, 134, 12)
+        {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                if(stack.getItem() instanceof CreditCard)
+                    return true;
+                return false;
             }
-        }
+        });
+
+
+        this.addSlot(new Slot(this.inventory, 1, 134, 52)
+        {
+            @Override
+            public boolean mayPlace(ItemStack stack) {
+                return false;
+            }
+        });
     }
 
     private void addPlayerInventory(PlayerInventory playerInventory)
     {
-
         for (int y = 0; y < 3; ++y) {
             for (int x = 0; x < 9; ++x) {
                 int index = x + y * 9 + 9;
@@ -83,12 +114,6 @@ public class ContainerBankServer extends Container {
         }
     }
 
-
-    @Override
-    public boolean stillValid(PlayerEntity player) {
-        return this.inventory.stillValid(player);
-    }
-
     @Override
     public ItemStack quickMoveStack(PlayerEntity player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
@@ -96,11 +121,11 @@ public class ContainerBankServer extends Container {
         if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            if (index < 27) {
-                if (!this.moveItemStackTo(itemstack1, 27, this.slots.size(), true)) {
+            if (index < 3) {
+                if (!this.moveItemStackTo(itemstack1, 3, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(itemstack1, 0, 27, false)) {
+            } else if (!this.moveItemStackTo(itemstack1, 0, 3, false)) {
                 return ItemStack.EMPTY;
             }
 
@@ -112,6 +137,11 @@ public class ContainerBankServer extends Container {
         }
 
         return itemstack;
+    }
+
+    @Override
+    public boolean stillValid(PlayerEntity player) {
+        return this.inventory.stillValid(player);
     }
 
     public void sync(UUID owner)

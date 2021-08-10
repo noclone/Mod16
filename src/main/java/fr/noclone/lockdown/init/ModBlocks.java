@@ -3,6 +3,9 @@ package fr.noclone.lockdown.init;
 import fr.noclone.lockdown.LockDown;
 import fr.noclone.lockdown.Safe.BlockSafe;
 import fr.noclone.lockdown.bankserver.BankServer;
+import fr.noclone.lockdown.clearer.Clearer;
+import fr.noclone.lockdown.paymentterminal.PaymentTerminal;
+import fr.noclone.lockdown.shop.Shop;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -25,6 +28,12 @@ public class ModBlocks {
     public static final RegistryObject<Block> SAFE = createBlock("safe", BlockSafe::new);
 
     public static final RegistryObject<Block> BANK_SERVER = createBlock("bank_server", BankServer::new);
+
+    public static final RegistryObject<Block> CLEARER = createBlock("clearer", Clearer::new);
+
+    public static final RegistryObject<Block> PAYMENT_TERMINAL = createBlock("payment_terminal", PaymentTerminal::new);
+
+    public static final RegistryObject<Block> SHOP = createBlock("shop", Shop::new);
 
     public static RegistryObject<Block> createBlock(String name, Supplier<? extends Block> supplier)
     {

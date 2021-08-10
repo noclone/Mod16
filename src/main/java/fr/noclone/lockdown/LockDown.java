@@ -24,7 +24,7 @@ public class LockDown {
     public static final ItemGroup LOCKDOWN_TAB = new ItemGroup("lockdown_tab") {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(ModItems.STEEL_INGOT.get());
+            return new ItemStack(ModItems.CREDIT_CARD.get());
         }
     };
 

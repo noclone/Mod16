@@ -7,6 +7,12 @@ import fr.noclone.lockdown.Safe.SafeScreen;
 import fr.noclone.lockdown.Safe.SafeScreenLocked;
 import fr.noclone.lockdown.bankserver.BankServerScreen;
 import fr.noclone.lockdown.bankserver.ContainerBankServer;
+import fr.noclone.lockdown.clearer.ClearerScreen;
+import fr.noclone.lockdown.clearer.ContainerClearer;
+import fr.noclone.lockdown.paymentterminal.ContainerPaymentTerminal;
+import fr.noclone.lockdown.paymentterminal.PaymentTerminalScreen;
+import fr.noclone.lockdown.shop.ContainerShop;
+import fr.noclone.lockdown.shop.ShopScreen;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
@@ -29,6 +35,12 @@ public class ModContainerTypes {
 
     public static final RegistryObject<ContainerType<ContainerBankServer>> BANK_SERVER = register("bank_server", ContainerBankServer::new);
 
+    public static final RegistryObject<ContainerType<ContainerClearer>> CLEARER = register("clearer", ContainerClearer::new);
+
+    public static final RegistryObject<ContainerType<ContainerPaymentTerminal>> PAYMENT_TERMINAL = register("payment_terminal", ContainerPaymentTerminal::new);
+
+    public static final RegistryObject<ContainerType<ContainerShop>> SHOP = register("shop", ContainerShop::new);
+
 
     @OnlyIn(Dist.CLIENT)
     public static void registerScreens(FMLClientSetupEvent event)
@@ -36,6 +48,9 @@ public class ModContainerTypes {
         ScreenManager.register(SAFE.get(), SafeScreen::new);
         ScreenManager.register(SAFE_LOCKED.get(), SafeScreenLocked::new);
         ScreenManager.register(BANK_SERVER.get(), BankServerScreen::new);
+        ScreenManager.register(CLEARER.get(), ClearerScreen::new);
+        ScreenManager.register(PAYMENT_TERMINAL.get(), PaymentTerminalScreen::new);
+        ScreenManager.register(SHOP.get(), ShopScreen::new);
     }
 
     private static <T extends Container> RegistryObject<ContainerType<T>> register(String name, IContainerFactory factory)

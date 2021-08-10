@@ -1,11 +1,15 @@
 {
   "item.lockdown.steel_ingot": "Steel Ingot",
   "item.lockdown.steel_bar": "Steel Bar",
+  "item.lockdown.credit_card": "Credit Card",
 
 
   "block.lockdown.steel_block": "Steel Block",
   "block.lockdown.safe": "Safe",
   "block.lockdown.bank_server": "Bank Server",
+  "block.lockdown.clearer": "Card Clearer",
+  "block.lockdown.payment_terminal": "Payment Terminal",
+  "block.lockdown.shop": "Shop",
 
   "itemGroup.lockdown_tab": "LockDown"
 }

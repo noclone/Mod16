@@ -1,8 +1,5 @@
 package fr.noclone.lockdown.Safe;
 
-import fr.noclone.lockdown.network.Messages;
-import fr.noclone.lockdown.network.PacketSyncSafe;
-import fr.noclone.lockdown.network.PacketSyncSafeClient;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -12,6 +9,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
@@ -81,7 +79,6 @@ public class BlockSafe extends Block {
         if (tileEntity instanceof TileEntitySafe && player instanceof ServerPlayerEntity) {
             TileEntitySafe te = (TileEntitySafe) tileEntity;
             NetworkHooks.openGui((ServerPlayerEntity) player, te, te::encodeExtraData);
-            Messages.INSTANCE.sendTo(new PacketSyncSafeClient(te.isUnlocked(), te.getCorrectPassword(), te.getOwner()), ((ServerPlayerEntity) player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 
@@ -93,6 +90,7 @@ public class BlockSafe extends Block {
             TileEntitySafe tileEntitySafe = (TileEntitySafe) te;
             if(tileEntitySafe.getOwner() != null && !tileEntitySafe.getOwner().equals(Minecraft.getInstance().player.getUUID()))
                 event.setCanceled(true);
+            InventoryHelper.dropContents(te.getLevel(),te.getBlockPos(), tileEntitySafe);
         }
     }
 

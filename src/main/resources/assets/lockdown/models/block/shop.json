@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "lockdown:block/shop",
+    "down": "lockdown:block/shop_bottom",
+    "up": "lockdown:block/shop_top",
+    "north": "lockdown:block/shop",
+    "south": "lockdown:block/shop_side",
+    "east": "lockdown:block/shop_side",
+    "west": "lockdown:block/shop_side"
+  }
+}

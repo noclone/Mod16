@@ -1,10 +1,16 @@
 package fr.noclone.lockdown.network;
 import fr.noclone.lockdown.bankserver.ContainerBankServer;
+import fr.noclone.lockdown.bankserver.TileEntityBankServer;
+import fr.noclone.lockdown.clearer.TileEntityClearer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.network.NetworkEvent;
+import org.lwjgl.BufferUtils;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -16,6 +22,7 @@ public class PacketSyncBankServer {
     public PacketSyncBankServer(UUID owner)
     {
         this.owner = owner;
+
     }
 
     public static void encode(PacketSyncBankServer packet, PacketBuffer buf)
@@ -25,9 +32,7 @@ public class PacketSyncBankServer {
 
     public static PacketSyncBankServer decode(PacketBuffer buf)
     {
-        UUID owner = buf.readUUID();
-        PacketSyncBankServer instance = new PacketSyncBankServer(owner);
-        return instance;
+        return new PacketSyncBankServer(buf.readUUID());
     }
 
     public static void handle(PacketSyncBankServer packet, Supplier<NetworkEvent.Context> ctx)

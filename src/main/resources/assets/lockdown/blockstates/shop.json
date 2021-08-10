@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "lockdown:block/shop",
+      "x": 90
+    },
+    "facing=up": {
+      "model": "lockdown:block/shop",
+      "x": -90
+    },
+    "facing=north": {
+      "model": "lockdown:block/shop"
+    },
+    "facing=south": {
+      "model": "lockdown:block/shop",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "lockdown:block/shop",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "lockdown:block/shop",
+      "y": 90
+    }
+  }
+}

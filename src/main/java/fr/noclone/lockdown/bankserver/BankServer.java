@@ -1,34 +1,51 @@
 package fr.noclone.lockdown.bankserver;
 
+import fr.noclone.lockdown.init.ModItems;
 import fr.noclone.lockdown.network.Messages;
 import fr.noclone.lockdown.network.PacketSyncBankServer;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FurnaceBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.EggItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.tileentity.SignTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 @Mod.EventBusSubscriber
 public class BankServer extends Block {
@@ -83,6 +100,7 @@ public class BankServer extends Block {
             TileEntityBankServer tileEntityBankServer = (TileEntityBankServer) te;
             if(tileEntityBankServer.getOwner() != null && !tileEntityBankServer.getOwner().equals(Minecraft.getInstance().player.getUUID()))
                     event.setCanceled(true);
+            InventoryHelper.dropContents(te.getLevel(),te.getBlockPos(), tileEntityBankServer);
         }
     }
 
@@ -95,6 +113,7 @@ public class BankServer extends Block {
             if(te.getOwner() == null)
             {
                 te.setOwner(Minecraft.getInstance().player.getUUID());
+                te.getLevel().sendBlockUpdated(te.getBlockPos(), te.getBlockState(), te.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE);
             }
         }
     }

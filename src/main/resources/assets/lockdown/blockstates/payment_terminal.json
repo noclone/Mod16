@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "lockdown:block/payment_terminal",
+      "x": 90
+    },
+    "facing=up": {
+      "model": "lockdown:block/payment_terminal",
+      "x": -90
+    },
+    "facing=north": {
+      "model": "lockdown:block/payment_terminal"
+    },
+    "facing=south": {
+      "model": "lockdown:block/payment_terminal",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "lockdown:block/payment_terminal",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "lockdown:block/payment_terminal",
+      "y": 90
+    }
+  }
+}
