@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BPB",
+    "BSB",
+    "BTB"
+  ],
+  "key": {
+    "B": {
+      "item": "lockdown:steel_block"
+    },
+    "T": {
+      "item": "minecraft:redstone_torch"
+    },
+    "S": {
+      "item": "lockdown:bank_server"
+    },
+    "P": {
+      "item": "minecraft:oak_sign"
+    }
+  },
+  "result": {
+    "item": "lockdown:payment_terminal"
+  }
+}

@@ -41,7 +41,7 @@ public class PacketBuyItem {
         TileEntity te = playerEntity.level.getBlockEntity(packet.pos);
         if(te instanceof TileEntityShop)
         {
-            ((TileEntityShop) te).BuyItem(packet.index, packet.shift);
+            ((TileEntityShop) te).BuyItem(packet.index, packet.shift, playerEntity);
         }
         ctx.get().setPacketHandled(true);
     }

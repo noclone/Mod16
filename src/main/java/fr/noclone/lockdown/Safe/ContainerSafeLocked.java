@@ -37,6 +37,12 @@ public class ContainerSafeLocked extends Container {
 
     private TileEntitySafe tileEntitySafe;
 
+    public PlayerInventory getPlayerInventory() {
+        return playerInventory;
+    }
+
+    private PlayerInventory playerInventory;
+
     public ContainerSafeLocked(int id, PlayerInventory playerInventory, PacketBuffer buffer)
     {
         this(id, playerInventory, getTileEntity(buffer), getArray(buffer));
@@ -62,6 +68,7 @@ public class ContainerSafeLocked extends Container {
         super(ModContainerTypes.SAFE_LOCKED.get(), id);
         this.tileEntitySafe = tileEntitySafe;
         this.fields = fields;
+        this.playerInventory = playerInventory;
     }
 
     @Override

@@ -33,13 +33,6 @@ public class PacketSyncPaymentTerminal {
     {
         PlayerEntity playerEntity = ctx.get().getSender();
         if(playerEntity == null) {
-            playerEntity = Minecraft.getInstance().player;
-            if(playerEntity.containerMenu instanceof ContainerPaymentTerminal)
-            {
-                ((ContainerPaymentTerminal) playerEntity.containerMenu).sync(packet.owner);
-                ctx.get().setPacketHandled(true);
-                return;
-            }
         }
 
         Container container = playerEntity.containerMenu;

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BRB",
+    "BTB",
+    "BRB"
+  ],
+  "key": {
+    "B": {
+      "item": "lockdown:steel_block"
+    },
+    "T": {
+      "item": "minecraft:redstone_torch"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "item": "lockdown:bank_server"
+  }
+}

@@ -110,9 +110,9 @@ public class BankServerScreen extends ContainerScreen<ContainerBankServer> {
                 ItemStack card = tileEntityBankServer.getCards().get(i);
                 CompoundNBT tag = card.getTag();
                 font.draw(matrixStack,TextFormatting.GRAY+"Acc "+i+": "
-                        +TextFormatting.DARK_GREEN+tileEntityBankServer.getLevel().getPlayerByUUID(tag.getUUID("owner")).getScoreboardName()+" "
+                        +TextFormatting.DARK_GREEN+GetName(containerBankServer.getPlayerInventory().player.level.getPlayerByUUID(tag.getUUID("owner")).getScoreboardName())+" "
                         +TextFormatting.GOLD+formatInt(tag.getInt("balance"))+" $", posX + 5,posY+20+10*(i+1), 0xFFFFFF);
-                if(tileEntityBankServer.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+                if(tileEntityBankServer.getOwner().equals(containerBankServer.getPlayerInventory().player.getUUID()))
                 {
                     buttonList.get(i).visible = true;
                     buttonList.get(i+3).visible = true;
@@ -121,6 +121,13 @@ public class BankServerScreen extends ContainerScreen<ContainerBankServer> {
         }
 
         this.renderTooltip(matrixStack, x, y);
+    }
+
+    private String GetName(String name)
+    {
+        if(name.length() <= 3)
+            return name;
+        return name.substring(0,3);
     }
 
     @Override

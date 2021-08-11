@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
@@ -20,6 +21,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -81,7 +84,7 @@ public class Shop extends Block {
         if(te instanceof TileEntityShop)
         {
             TileEntityShop tileentityshop = (TileEntityShop) te;
-            if(tileentityshop.getOwner() != null && !tileentityshop.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+            if(tileentityshop.getOwner() != null && !tileentityshop.getOwner().equals(event.getPlayer().getUUID()))
                     event.setCanceled(true);
             InventoryHelper.dropItemStack(te.getLevel(),te.getBlockPos().getX(), te.getBlockPos().getY(),te.getBlockPos().getZ(), tileentityshop.getItem(0));
         }
@@ -90,17 +93,24 @@ public class Shop extends Block {
     @Override
     public void onPlace(BlockState p_220082_1_, World world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
         super.onPlace(p_220082_1_, world, pos, p_220082_4_, p_220082_5_);
-        TileEntity tileEntity = world.getBlockEntity(pos);
+    }
+
+    @Override
+    public void setPlacedBy(World p_180633_1_, BlockPos p_180633_2_, BlockState p_180633_3_, @Nullable LivingEntity p_180633_4_, ItemStack p_180633_5_) {
+        super.setPlacedBy(p_180633_1_, p_180633_2_, p_180633_3_, p_180633_4_, p_180633_5_);
+
+        TileEntity tileEntity = p_180633_1_.getBlockEntity(p_180633_2_);
         if (tileEntity instanceof TileEntityShop) {
             TileEntityShop te = (TileEntityShop) tileEntity;
             if(te.getOwner() == null)
             {
-                te.setOwner(Minecraft.getInstance().player.getUUID());
+                te.setOwner(p_180633_4_.getUUID());
                 te.getLevel().sendBlockUpdated(te.getBlockPos(), te.getBlockState(), te.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE);
             }
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void tooltip(ItemTooltipEvent event)
     {

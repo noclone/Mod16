@@ -39,28 +39,15 @@ public class CreditCard extends Item {
     }
 
     @Override
-    public void onCraftedBy(ItemStack p_77622_1_, World p_77622_2_, PlayerEntity p_77622_3_) {
-        super.onCraftedBy(p_77622_1_, p_77622_2_, p_77622_3_);
-        p_77622_1_.setTag(new CompoundNBT());
-        p_77622_1_.getTag().putUUID("banker", p_77622_3_.getUUID());
-        p_77622_1_.getTag().putUUID("id", UUID.randomUUID());
-    }
-
-    @Override
-    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
-        if(!stack.hasTag())
+    public void inventoryTick(ItemStack itemStack, World world, Entity entity, int p_77663_4_, boolean p_77663_5_) {
+        super.inventoryTick(itemStack, world, entity, p_77663_4_, p_77663_5_);
+        if(!itemStack.hasTag())
         {
             CompoundNBT tag = new CompoundNBT();
-            tag.putUUID("banker", context.getPlayer().getUUID());
+            tag.putUUID("banker", entity.getUUID());
             tag.putUUID("id", UUID.randomUUID());
-            stack.setTag(tag);
+            itemStack.setTag(tag);
         }
-        return super.onItemUseFirst(stack, context);
-    }
-
-    @Override
-    public void inventoryTick(ItemStack itemStack, World world, Entity p_77663_3_, int p_77663_4_, boolean p_77663_5_) {
-        super.inventoryTick(itemStack, world, p_77663_3_, p_77663_4_, p_77663_5_);
 
         if(itemStack.hasTag())
         {
@@ -103,6 +90,7 @@ public class CreditCard extends Item {
         return tag;
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.appendHoverText(itemStack, world, tooltip, flag);

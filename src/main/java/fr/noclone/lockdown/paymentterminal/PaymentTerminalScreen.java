@@ -32,7 +32,7 @@ public class PaymentTerminalScreen extends ContainerScreen<ContainerPaymentTermi
 
     TextFieldWidget box;
 
-    int message = 0;
+    int message = -1;
 
     public PaymentTerminalScreen(ContainerPaymentTerminal containerPaymentTerminal, PlayerInventory playerInventory, ITextComponent textComponent) {
         super(containerPaymentTerminal, playerInventory, textComponent);
@@ -69,12 +69,17 @@ public class PaymentTerminalScreen extends ContainerScreen<ContainerPaymentTermi
                 break;
             }
         }
-        if(box.getValue().isEmpty() || !valid)
+        if(containerPaymentTerminal.getSlot(0).getItem().isEmpty() || containerPaymentTerminal.getSlot(1).getItem().isEmpty())
+        {
+            message = 0;
+            return;
+        }
+        else if(box.getValue().isEmpty() || !valid)
         {
             message = 1;
             return;
         }
-        else if(!containerPaymentTerminal.getSlot(0).getItem().getTag().getUUID("owner").equals(Minecraft.getInstance().player.getUUID()))
+        else if(!containerPaymentTerminal.getSlot(0).getItem().getTag().getUUID("owner").equals(containerPaymentTerminal.getPlayerInventory().player.getUUID()))
             message = 2;
         else if(containerPaymentTerminal.getSlot(0).getItem().getTag().getInt("balance") < Integer.parseInt(box.getValue()))
             message = 3;
@@ -94,6 +99,9 @@ public class PaymentTerminalScreen extends ContainerScreen<ContainerPaymentTermi
             box.render(matrixStack, x, y, partialTicks);
         switch (message)
         {
+            case 0:
+                drawCenteredString(matrixStack,font,new TranslationTextComponent(TextFormatting.RED+"Missing Card !"), getGuiLeft()+imageWidth/2, getGuiTop()+63, 0xFFFFFF);
+                break;
             case 1:
                 drawCenteredString(matrixStack,font,new TranslationTextComponent(TextFormatting.RED+"Please enter an amount !"), getGuiLeft()+imageWidth/2, getGuiTop()+63, 0xFFFFFF);
                 break;

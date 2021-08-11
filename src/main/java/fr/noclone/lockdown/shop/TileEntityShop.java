@@ -303,7 +303,7 @@ public class TileEntityShop extends LockableTileEntity implements ISidedInventor
         items.get(index).getTag().putInt("price", value);
     }
 
-    public void BuyItem(int index, boolean shift) {
+    public void BuyItem(int index, boolean shift, PlayerEntity playerEntity) {
         if(items.get(0).isEmpty() || OwnerAccountPos == null)
             return;
 
@@ -359,7 +359,7 @@ public class TileEntityShop extends LockableTileEntity implements ISidedInventor
                 if (stackToGive.getTag().isEmpty())
                     stackToGive.setTag(null);
                 stackToGive.setCount(wanted);
-                level.getPlayerByUUID(Minecraft.getInstance().player.getUUID()).inventory.add(stackToGive);
+                playerEntity.inventory.add(stackToGive);
                 card.getTag().putInt("balance", card.getTag().getInt("balance") - price * wanted);
                 ownerCard.getTag().putInt("balance", ownerCard.getTag().getInt("balance") + price * wanted);
                 total -= wanted;

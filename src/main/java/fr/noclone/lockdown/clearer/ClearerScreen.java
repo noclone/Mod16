@@ -4,9 +4,12 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.noclone.lockdown.LockDown;
 import fr.noclone.lockdown.creditcard.CreditCard;
+import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketSendPlayerEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -30,6 +33,10 @@ public class ClearerScreen extends ContainerScreen<ContainerClearer> {
 
     ContainerClearer containerClearer;
 
+    boolean success;
+
+    boolean failed;
+
 
     public ClearerScreen(ContainerClearer containerClearer, PlayerInventory playerInventory, ITextComponent textComponent) {
         super(containerClearer, playerInventory, textComponent);
@@ -43,6 +50,23 @@ public class ClearerScreen extends ContainerScreen<ContainerClearer> {
     }
 
     @Override
+    protected void init() {
+        super.init();
+        buttons.clear();
+        addButton(new Button(getGuiLeft()+imageWidth/2-20,getGuiTop()+60, 40, 10, new TranslationTextComponent("Clear"), (button)->{clear();}));
+    }
+
+    private void clear()
+    {
+        Messages.INSTANCE.sendToServer(new PacketSendPlayerEntity(tileEntityClearer.getBlockPos()));
+
+        if(!containerClearer.getSlot(0).getItem().hasTag() && containerClearer.getSlot(0).getItem().getTag().getUUID("banker").equals(containerClearer.getPlayerInventory().player.getUUID()))
+            failed = true;
+        else
+            success = true;
+    }
+
+    @Override
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
@@ -50,9 +74,9 @@ public class ClearerScreen extends ContainerScreen<ContainerClearer> {
 
         if(!containerClearer.getSlot(0).getItem().isEmpty() && containerClearer.getSlot(0).getItem().getItem() instanceof CreditCard)
         {
-            if(!containerClearer.getSlot(0).getItem().hasTag() && containerClearer.getSlot(0).getItem().getTag().getUUID("banker").equals(Minecraft.getInstance().player.getUUID()))
+            if(failed)
                 drawCenteredString(matrixStack,font,new TranslationTextComponent("Only the banker can clear a credit card !"), getGuiLeft()+imageWidth/2, getGuiTop()+20, 0xFF0000);
-            else
+            if(success)
                 drawCenteredString(matrixStack,font,new TranslationTextComponent("Credit Card Cleared !"), getGuiLeft()+imageWidth/2, getGuiTop()+20, 0x52FF33);
         }
     }

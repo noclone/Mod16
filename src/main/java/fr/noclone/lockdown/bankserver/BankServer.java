@@ -11,6 +11,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.FluidState;
@@ -98,21 +99,21 @@ public class BankServer extends Block {
         if(te instanceof TileEntityBankServer)
         {
             TileEntityBankServer tileEntityBankServer = (TileEntityBankServer) te;
-            if(tileEntityBankServer.getOwner() != null && !tileEntityBankServer.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+            if(tileEntityBankServer.getOwner() != null && !tileEntityBankServer.getOwner().equals(event.getPlayer().getUUID()))
                     event.setCanceled(true);
             InventoryHelper.dropContents(te.getLevel(),te.getBlockPos(), tileEntityBankServer);
         }
     }
 
     @Override
-    public void onPlace(BlockState p_220082_1_, World world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
-        super.onPlace(p_220082_1_, world, pos, p_220082_4_, p_220082_5_);
+    public void setPlacedBy(World world, BlockPos pos, BlockState p_180633_3_, @Nullable LivingEntity entity, ItemStack p_180633_5_) {
+        super.setPlacedBy(world, pos, p_180633_3_, entity, p_180633_5_);
+
         TileEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof TileEntityBankServer) {
             TileEntityBankServer te = (TileEntityBankServer) tileEntity;
-            if(te.getOwner() == null)
-            {
-                te.setOwner(Minecraft.getInstance().player.getUUID());
+            if(te.getOwner() == null) {
+                te.setOwner(entity.getUUID());
                 te.getLevel().sendBlockUpdated(te.getBlockPos(), te.getBlockState(), te.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE);
             }
         }

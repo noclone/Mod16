@@ -96,5 +96,11 @@ public class Messages {
                 .decoder(PacketCopyCard::decode)
                 .consumer(PacketCopyCard::handle)
                 .add();
+
+        INSTANCE.messageBuilder(PacketSendPlayerEntity.class, id++)
+                .encoder(PacketSendPlayerEntity::encode)
+                .decoder(PacketSendPlayerEntity::decode)
+                .consumer(PacketSendPlayerEntity::handle)
+                .add();
     }
 }

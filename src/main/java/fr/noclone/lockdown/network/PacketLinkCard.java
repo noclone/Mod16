@@ -36,7 +36,7 @@ public class PacketLinkCard {
         TileEntity te = playerEntity.level.getBlockEntity(packet.pos);
         if(te instanceof TileEntityBankServer)
         {
-            ((TileEntityBankServer) te).LinkCard();
+            ((TileEntityBankServer) te).LinkCard(playerEntity);
         }
         ctx.get().setPacketHandled(true);
     }

@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -61,7 +62,7 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
 
         tileEntitySafe.setOwner(containerSafeLocked.getTileEntitySafe().getOwner());
 
-        if(tileEntitySafe.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+        if(tileEntitySafe.getOwner().equals(containerSafeLocked.getPlayerInventory().player.getUUID()))
             isOwner = true;
     }
 
@@ -135,11 +136,12 @@ public class SafeScreenLocked extends ContainerScreen<ContainerSafeLocked> {
         {
             tileEntitySafe.setUnlocked(true);
             SendUpdatesToServer();
+            World level = containerSafeLocked.getPlayerInventory().player.level;
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.player.closeContainer();
-            minecraft.player.playSound(SoundEvents.ANVIL_BREAK,1.0f,1.0f);
-            BlockState state = minecraft.level.getBlockState(tileEntitySafe.getBlockPos());
-            minecraft.level.setBlock(tileEntitySafe.getBlockPos(), state.setValue(BlockStateProperties.LOCKED, false),
+            containerSafeLocked.getPlayerInventory().player.playSound(SoundEvents.ANVIL_BREAK,1.0f,1.0f);
+            BlockState state = level.getBlockState(tileEntitySafe.getBlockPos());
+           level.setBlock(tileEntitySafe.getBlockPos(), state.setValue(BlockStateProperties.LOCKED, false),
                     Constants.BlockFlags.NOTIFY_NEIGHBORS+Constants.BlockFlags.BLOCK_UPDATE);
         }
     }

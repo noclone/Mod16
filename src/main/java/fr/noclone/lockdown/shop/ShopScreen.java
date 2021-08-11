@@ -3,9 +3,6 @@ package fr.noclone.lockdown.shop;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.noclone.lockdown.LockDown;
-import fr.noclone.lockdown.clearer.ContainerClearer;
-import fr.noclone.lockdown.clearer.TileEntityClearer;
-import fr.noclone.lockdown.creditcard.CreditCard;
 import fr.noclone.lockdown.network.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -24,11 +21,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import org.lwjgl.opengl.GL11;
-import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,8 +128,11 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
     private void PlusMinus(int add) {
         if(box.getValue().isEmpty() || !IsValid())
             return;
-        int val = Integer.parseInt(box.getValue());
-        box.setValue(val+add+"");
+        int val = Integer.parseInt(box.getValue()) + add;
+        if(val < 0)
+            val = 0;
+        box.setValue(val+"");
+
     }
 
     private boolean IsValid()
@@ -163,10 +158,10 @@ public class ShopScreen extends ContainerScreen<ContainerShop> {
     public void render(MatrixStack matrixStack, int x, int y, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, x, y, partialTicks);
-        if(tileEntityShop.getOwner().equals(Minecraft.getInstance().player.getUUID()) && !buttonList.get(3).visible)
+        if(tileEntityShop.getOwner().equals(containerShop.getPlayerInventory().player.getUUID()) && !buttonList.get(3).visible)
             buttonList.get(3).visible = true;
 
-        if(Minecraft.getInstance().player.isCreative() && !buttonList.get(4).visible)
+        if(Minecraft.getInstance().player.isCreative() && tileEntityShop.getOwner().equals(containerShop.getPlayerInventory().player.getUUID()) && !buttonList.get(4).visible)
             buttonList.get(4).visible = true;
 
         if(box != null)

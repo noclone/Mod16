@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LS",
+    "LR"
+  ],
+  "key": {
+    "S": {
+      "item": "lockdown:steel_ingot"
+    },
+    "L": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "item": "lockdown:credit_card"
+  }
+}

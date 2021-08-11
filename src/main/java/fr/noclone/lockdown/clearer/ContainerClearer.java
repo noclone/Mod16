@@ -2,6 +2,8 @@ package fr.noclone.lockdown.clearer;
 
 import fr.noclone.lockdown.creditcard.CreditCard;
 import fr.noclone.lockdown.init.ModContainerTypes;
+import fr.noclone.lockdown.network.Messages;
+import fr.noclone.lockdown.network.PacketSendPlayerEntity;
 import fr.noclone.lockdown.shop.TileEntityShop;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -80,7 +82,9 @@ public class ContainerClearer extends Container{
             @Override
             public boolean mayPlace(ItemStack stack) {
                 if(stack.getItem() instanceof CreditCard)
+                {
                     return true;
+                }
                 return false;
             }
         });

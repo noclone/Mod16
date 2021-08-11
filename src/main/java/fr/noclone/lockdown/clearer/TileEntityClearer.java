@@ -3,6 +3,7 @@ package fr.noclone.lockdown.clearer;
 import fr.noclone.lockdown.bankserver.TileEntityBankServer;
 import fr.noclone.lockdown.creditcard.CreditCard;
 import fr.noclone.lockdown.init.ModTileEntities;
+import fr.noclone.lockdown.network.Messages;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.client.Minecraft;
@@ -252,38 +253,41 @@ public class TileEntityClearer extends LockableTileEntity implements ISidedInven
     public void tick() {
         if(!level.isClientSide)
         {
-            if(!items.get(0).isEmpty())
+        }
+    }
+
+    public void clear(PlayerEntity playerEntity) {
+        if(!items.get(0).isEmpty())
+        {
+            ItemStack item = items.get(0);
+            if(item.getItem() instanceof CreditCard)
             {
-                ItemStack item = items.get(0);
-                if(item.getItem() instanceof CreditCard)
+                if(item.hasTag())
                 {
-                    if(item.hasTag())
+                    CompoundNBT tag = item.getTag();
+                    if(tag.getUUID("banker").equals(playerEntity.getUUID()))
                     {
-                        CompoundNBT tag = item.getTag();
-                        if(tag.getUUID("banker").equals(Minecraft.getInstance().player.getUUID()))
+                        if(tag.contains("owner"))
+                            tag.remove("owner");
+                        if(tag.contains("balance"))
+                            tag.remove("balance");
+                        if(tag.contains("serverX"))
                         {
-                            if(tag.contains("owner"))
-                                tag.remove("owner");
-                            if(tag.contains("balance"))
-                                tag.remove("balance");
-                            if(tag.contains("serverX"))
+                            TileEntity te = level.getBlockEntity(new BlockPos(tag.getInt("serverX"),tag.getInt("serverY"),tag.getInt("serverZ")));
+                            if(te instanceof TileEntityBankServer)
                             {
-                                TileEntity te = level.getBlockEntity(new BlockPos(tag.getInt("serverX"),tag.getInt("serverY"),tag.getInt("serverZ")));
-                                if(te instanceof TileEntityBankServer)
+                                TileEntityBankServer server = (TileEntityBankServer) te;
+                                NonNullList<ItemStack> cards = server.getCards();
+                                for(int i = 0; i < TileEntityBankServer.MAX_CARDS; i++)
                                 {
-                                    TileEntityBankServer server = (TileEntityBankServer) te;
-                                    NonNullList<ItemStack> cards = server.getCards();
-                                    for(int i = 0; i < TileEntityBankServer.MAX_CARDS; i++)
-                                    {
-                                        if(!cards.get(i).isEmpty() && cards.get(i).getTag().getUUID("id").equals(tag.getUUID("id")))
-                                            cards.set(i,ItemStack.EMPTY);
-                                    }
-                                    server.setCards(cards);
+                                    if(!cards.get(i).isEmpty() && cards.get(i).getTag().getUUID("id").equals(tag.getUUID("id")))
+                                        cards.set(i,ItemStack.EMPTY);
                                 }
-                                tag.remove("serverX");
-                                tag.remove("serverY");
-                                tag.remove("serverZ");
+                                server.setCards(cards);
                             }
+                            tag.remove("serverX");
+                            tag.remove("serverY");
+                            tag.remove("serverZ");
                         }
                     }
                 }

@@ -88,21 +88,21 @@ public class BlockSafe extends Block {
         if(te instanceof TileEntitySafe)
         {
             TileEntitySafe tileEntitySafe = (TileEntitySafe) te;
-            if(tileEntitySafe.getOwner() != null && !tileEntitySafe.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+            if(tileEntitySafe.getOwner() != null && !tileEntitySafe.getOwner().equals(event.getPlayer().getUUID()))
                 event.setCanceled(true);
             InventoryHelper.dropContents(te.getLevel(),te.getBlockPos(), tileEntitySafe);
         }
     }
 
     @Override
-    public void onPlace(BlockState p_220082_1_, World world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
-        super.onPlace(p_220082_1_, world, pos, p_220082_4_, p_220082_5_);
-        TileEntity tileEntity = world.getBlockEntity(pos);
+    public void setPlacedBy(World p_180633_1_, BlockPos p_180633_2_, BlockState p_180633_3_, @Nullable LivingEntity p_180633_4_, ItemStack p_180633_5_) {
+        super.setPlacedBy(p_180633_1_, p_180633_2_, p_180633_3_, p_180633_4_, p_180633_5_);
+        TileEntity tileEntity = p_180633_1_.getBlockEntity(p_180633_2_);
         if (tileEntity instanceof TileEntitySafe) {
             TileEntitySafe te = (TileEntitySafe) tileEntity;
             if(te.getOwner() == null)
             {
-                te.setOwner(Minecraft.getInstance().player.getUUID());
+                te.setOwner(p_180633_4_.getUUID());
             }
         }
     }

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BPB",
+    "BSB",
+    "BTB"
+  ],
+  "key": {
+    "B": {
+      "item": "lockdown:steel_bar"
+    },
+    "T": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "minecraft:chest"
+    },
+    "P": {
+      "item": "lockdown:steel_ingot"
+    }
+  },
+  "result": {
+    "item": "lockdown:safe"
+  }
+}

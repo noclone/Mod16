@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SBS",
+    "BGB",
+    "SBS"
+  ],
+  "key": {
+    "S": {
+      "item": "lockdown:steel_ingot"
+    },
+    "B": {
+      "item": "lockdown:steel_bar"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    }
+  },
+  "result": {
+    "item": "lockdown:clearer"
+  }
+}

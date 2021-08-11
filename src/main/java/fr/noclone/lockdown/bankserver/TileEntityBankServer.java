@@ -329,8 +329,8 @@ public class TileEntityBankServer extends LockableTileEntity implements ISidedIn
         cards.set(i, ItemStack.EMPTY);
     }
 
-    public void LinkCard() {
-        if(isCardsFull() || !owner.equals(Minecraft.getInstance().player.getUUID()))
+    public void LinkCard(PlayerEntity playerEntity) {
+        if(isCardsFull())
             return;
         ItemStack item = items.get(0).copy();
         if(item.getItem() instanceof CreditCard)
@@ -338,11 +338,11 @@ public class TileEntityBankServer extends LockableTileEntity implements ISidedIn
             if(!item.hasTag())
             {
                 item.setTag(new CompoundNBT());
-                item.getTag().putUUID("banker", Minecraft.getInstance().player.getUUID());
+                item.getTag().putUUID("banker", playerEntity.getUUID());
             }
             if(!item.getTag().contains("owner"))
             {
-                item.getTag().putUUID("owner",Minecraft.getInstance().player.getUUID());
+                item.getTag().putUUID("owner",playerEntity.getUUID());
                 item.getTag().putInt("balance",0);
                 item.getTag().putInt("serverX", getBlockPos().getX());
                 item.getTag().putInt("serverY", getBlockPos().getY());
@@ -361,8 +361,8 @@ public class TileEntityBankServer extends LockableTileEntity implements ISidedIn
         }
     }
 
-    public void CopyCard(int x) {
-        if(!owner.equals(Minecraft.getInstance().player.getUUID()))
+    public void CopyCard(int x, PlayerEntity playerEntity) {
+        if(!owner.equals(playerEntity.getUUID()))
             return;
         ItemStack item = items.get(0).copy();
         ItemStack account = cards.get(x);

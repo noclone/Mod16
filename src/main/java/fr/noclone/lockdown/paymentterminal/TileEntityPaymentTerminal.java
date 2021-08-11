@@ -254,13 +254,13 @@ public class TileEntityPaymentTerminal extends LockableTileEntity implements ISi
         }
     }
 
-    public void Pay(int amount) {
+    public void Pay(int amount, PlayerEntity playerEntity) {
         if(items.get(0).isEmpty() || items.get(1).isEmpty())
             return;
         CompoundNBT Stag = items.get(0).getTag();
         CompoundNBT Rtag = items.get(1).getTag();
 
-        if(!Stag.getUUID("owner").equals(Minecraft.getInstance().player.getUUID()))
+        if(!Stag.getUUID("owner").equals(playerEntity.getUUID()))
             return;
 
         TileEntityBankServer Tsender = (TileEntityBankServer) level.getBlockEntity(new BlockPos(Stag.getInt("serverX"),Stag.getInt("serverY"),Stag.getInt("serverZ")));

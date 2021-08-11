@@ -5,10 +5,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -78,21 +80,22 @@ public class PaymentTerminal extends Block {
         if(te instanceof TileEntityPaymentTerminal)
         {
             TileEntityPaymentTerminal tileentityTerminal = (TileEntityPaymentTerminal) te;
-            if(tileentityTerminal.getOwner() != null && !tileentityTerminal.getOwner().equals(Minecraft.getInstance().player.getUUID()))
+            if(tileentityTerminal.getOwner() != null && !tileentityTerminal.getOwner().equals(event.getPlayer().getUUID()))
                     event.setCanceled(true);
             InventoryHelper.dropContents(te.getLevel(),te.getBlockPos(), tileentityTerminal);
         }
     }
 
     @Override
-    public void onPlace(BlockState p_220082_1_, World world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
-        super.onPlace(p_220082_1_, world, pos, p_220082_4_, p_220082_5_);
-        TileEntity tileEntity = world.getBlockEntity(pos);
+    public void setPlacedBy(World p_180633_1_, BlockPos p_180633_2_, BlockState p_180633_3_, @Nullable LivingEntity p_180633_4_, ItemStack p_180633_5_) {
+        super.setPlacedBy(p_180633_1_, p_180633_2_, p_180633_3_, p_180633_4_, p_180633_5_);
+
+        TileEntity tileEntity = p_180633_1_.getBlockEntity(p_180633_2_);
         if (tileEntity instanceof TileEntityPaymentTerminal) {
             TileEntityPaymentTerminal te = (TileEntityPaymentTerminal) tileEntity;
             if(te.getOwner() == null)
             {
-                te.setOwner(Minecraft.getInstance().player.getUUID());
+                te.setOwner(p_180633_4_.getUUID());
                 te.getLevel().sendBlockUpdated(te.getBlockPos(), te.getBlockState(), te.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE);
             }
         }

@@ -31,17 +31,26 @@ public class PacketSyncSafe{
 
     public static void encode(PacketSyncSafe packet, PacketBuffer buf)
     {
-        buf.writeUtf(packet.correctPassword);
+        buf.writeInt(packet.correctPassword.length());
+        for(int i = 0; i < packet.correctPassword.length();  i++)
+        {
+            buf.writeChar(packet.correctPassword.charAt(i));
+        }
         buf.writeBoolean(packet.isUnlocked);
         buf.writeUUID(packet.owner);
     }
 
     public static PacketSyncSafe decode(PacketBuffer buf)
     {
-        String correctPassword = buf.readUtf();
+        int lenght = buf.readInt();
+        String pwd = "";
+        for(int i = 0; i < lenght;  i++)
+        {
+            pwd += buf.readChar();
+        }
         Boolean isUnlocked = buf.readBoolean();
         UUID owner = buf.readUUID();
-        PacketSyncSafe instance = new PacketSyncSafe(isUnlocked, correctPassword, owner);
+        PacketSyncSafe instance = new PacketSyncSafe(isUnlocked, pwd, owner);
         return instance;
     }
 

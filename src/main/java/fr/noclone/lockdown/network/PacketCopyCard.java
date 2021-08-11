@@ -38,7 +38,7 @@ public class PacketCopyCard {
         TileEntity te = playerEntity.level.getBlockEntity(packet.pos);
         if(te instanceof TileEntityBankServer)
         {
-            ((TileEntityBankServer) te).CopyCard(packet.i);
+            ((TileEntityBankServer) te).CopyCard(packet.i, playerEntity);
         }
         ctx.get().setPacketHandled(true);
     }

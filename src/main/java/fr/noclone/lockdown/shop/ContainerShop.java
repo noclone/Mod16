@@ -9,7 +9,6 @@ import fr.noclone.lockdown.network.PacketBuyItem;
 import fr.noclone.lockdown.network.PacketChangeGhost;
 import fr.noclone.lockdown.network.PacketLinkShopCard;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
